@@ -1,7 +1,6 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
-from src import database
-create_connection = database.create_connection
+from src.database import create_connection
 
 class CategoryPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
