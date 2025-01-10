@@ -263,9 +263,9 @@ class LoanPage(ctk.CTkFrame):
                 self.search_book_frame.grid(row=5, column=0, pady=10, padx=10, sticky="nsew")
     
         def return_loan(self):
-        try:
-            loan_id = self.loan_id_entry.get()
-            if not loan_id:
+            try:
+                loan_id = self.loan_id_entry.get()
+                if not loan_id:
                 messagebox.showerror("Error", "Please enter a loan ID")
                 return
             
