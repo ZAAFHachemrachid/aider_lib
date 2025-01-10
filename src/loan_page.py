@@ -56,23 +56,39 @@ class LoanPage(ctk.CTkFrame):
         self.loan_id_entry.pack(pady=5, padx=10, fill="x")
         
         ctk.CTkButton(self.return_frame, text="Return Book", command=self.return_loan).pack(pady=10)
+        # Search Forms
+        self.search_loan_frame = ctk.CTkFrame(self.left_container)
+        self.search_loan_frame.grid(row=2, column=0, pady=10, padx=10, sticky="nsew")
         
-        # Search Form
-        self.search_frame = ctk.CTkFrame(self.left_container)
-        self.search_frame.grid(row=2, column=0, pady=10, padx=10, sticky="nsew")
+        ctk.CTkLabel(self.search_loan_frame, text="Search Loans", font=("Arial", 16, "bold")).pack(pady=5)
         
-        ctk.CTkLabel(self.search_frame, text="Search", font=("Arial", 16, "bold")).pack(pady=5)
-        
-        self.search_loan_id_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Loan ID")
+        self.search_loan_id_entry = ctk.CTkEntry(self.search_loan_frame, placeholder_text="Loan ID")
         self.search_loan_id_entry.pack(pady=5, padx=10, fill="x")
         
-        self.search_user_id_entry = ctk.CTkEntry(self.search_frame, placeholder_text="User ID")
+        ctk.CTkButton(self.search_loan_frame, text="Search", command=self.search_loans).pack(pady=5)
+        ctk.CTkButton(self.search_loan_frame, text="Reset", command=self.reset_loan_search).pack(pady=5)
+        
+        self.search_user_frame = ctk.CTkFrame(self.left_container)
+        self.search_user_frame.grid(row=3, column=0, pady=10, padx=10, sticky="nsew")
+        
+        ctk.CTkLabel(self.search_user_frame, text="Search Users", font=("Arial", 16, "bold")).pack(pady=5)
+        
+        self.search_user_id_entry = ctk.CTkEntry(self.search_user_frame, placeholder_text="User ID")
         self.search_user_id_entry.pack(pady=5, padx=10, fill="x")
         
-        self.search_book_id_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Book ID")
+        ctk.CTkButton(self.search_user_frame, text="Search", command=self.search_users).pack(pady=5)
+        ctk.CTkButton(self.search_user_frame, text="Reset", command=self.reset_user_search).pack(pady=5)
+        
+        self.search_book_frame = ctk.CTkFrame(self.left_container)
+        self.search_book_frame.grid(row=4, column=0, pady=10, padx=10, sticky="nsew")
+        
+        ctk.CTkLabel(self.search_book_frame, text="Search Books", font=("Arial", 16, "bold")).pack(pady=5)
+        
+        self.search_book_id_entry = ctk.CTkEntry(self.search_book_frame, placeholder_text="Book ID")
         self.search_book_id_entry.pack(pady=5, padx=10, fill="x")
         
-        ctk.CTkButton(self.search_frame, text="Search", command=self.search_loans).pack(pady=10)
+        ctk.CTkButton(self.search_book_frame, text="Search", command=self.search_books).pack(pady=5)
+        ctk.CTkButton(self.search_book_frame, text="Reset", command=self.reset_book_search).pack(pady=5)
         
         # Right side - Tables
         self.table_container = ctk.CTkFrame(self)
@@ -266,16 +282,10 @@ class LoanPage(ctk.CTkFrame):
     
     def search_loans(self):
         loan_id = self.search_loan_id_entry.get()
-        user_id = self.search_user_id_entry.get()
-        book_id = self.search_book_id_entry.get()
         
-        # Clear the current tables
+        # Clear the current table
         for item in self.loan_tree.get_children():
             self.loan_tree.delete(item)
-        for item in self.user_tree.get_children():
-            self.user_tree.delete(item)
-        for item in self.book_tree.get_children():
-            self.book_tree.delete(item)
         
         try:
             conn = create_connection()
@@ -291,30 +301,68 @@ class LoanPage(ctk.CTkFrame):
             if loan_id:
                 query += " AND id = ?"
                 params.append(int(loan_id))
-            if user_id:
-                query += " AND user_id = ?"
-                params.append(int(user_id))
-            if book_id:
-                query += " AND book_id = ?"
-                params.append(int(book_id))
             
             cursor.execute(query, params)
             
             for row in cursor.fetchall():
                 self.loan_tree.insert('', 'end', values=row)
+                
+            conn.close()
             
-            # Get users
-            cursor.execute("""
-                SELECT id, name FROM users
-            """)
+        except Exception as e:
+            messagebox.showerror("Error", f"Error searching loans: {e}")
+    
+    def search_users(self):
+        user_id = self.search_user_id_entry.get()
+        
+        # Clear the current table
+        for item in self.user_tree.get_children():
+            self.user_tree.delete(item)
+        
+        try:
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            query = """
+                SELECT id, name FROM users WHERE 1=1
+            """
+            params = []
+            
+            if user_id:
+                query += " AND id = ?"
+                params.append(int(user_id))
+            
+            cursor.execute(query, params)
             
             for row in cursor.fetchall():
                 self.user_tree.insert('', 'end', values=row)
+                
+            conn.close()
             
-            # Get books
-            cursor.execute("""
-                SELECT id, title FROM books
-            """)
+        except Exception as e:
+            messagebox.showerror("Error", f"Error searching users: {e}")
+    
+    def search_books(self):
+        book_id = self.search_book_id_entry.get()
+        
+        # Clear the current table
+        for item in self.book_tree.get_children():
+            self.book_tree.delete(item)
+        
+        try:
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            query = """
+                SELECT id, title FROM books WHERE 1=1
+            """
+            params = []
+            
+            if book_id:
+                query += " AND id = ?"
+                params.append(int(book_id))
+            
+            cursor.execute(query, params)
             
             for row in cursor.fetchall():
                 self.book_tree.insert('', 'end', values=row)
@@ -322,7 +370,19 @@ class LoanPage(ctk.CTkFrame):
             conn.close()
             
         except Exception as e:
-            messagebox.showerror("Error", f"Error searching loans: {e}")
+            messagebox.showerror("Error", f"Error searching books: {e}")
+    
+    def reset_loan_search(self):
+        self.search_loan_id_entry.delete(0, 'end')
+        self.refresh_table()
+    
+    def reset_user_search(self):
+        self.search_user_id_entry.delete(0, 'end')
+        self.refresh_table()
+    
+    def reset_book_search(self):
+        self.search_book_id_entry.delete(0, 'end')
+        self.refresh_table()
     
     def clear_return_entries(self):
         self.loan_id_entry.delete(0, 'end')
