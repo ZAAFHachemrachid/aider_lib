@@ -34,23 +34,50 @@ class AuthorPage(ctk.CTkFrame):
         
         ctk.CTkLabel(self.create_frame, text="Create Author", font=("Arial", 16, "bold")).pack(pady=5)
         
+        self.name_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Name")
+        self.name_entry.pack(pady=5, padx=10, fill="x")
+        
+        ctk.CTkButton(self.create_frame, text="Create", command=self.create_author).pack(pady=10)
+        
         # Update Form
         self.update_frame = ctk.CTkFrame(self.left_container)
         self.update_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
         
         ctk.CTkLabel(self.update_frame, text="Update Author", font=("Arial", 16, "bold")).pack(pady=5)
         
+        self.update_id_entry = ctk.CTkEntry(self.update_frame, placeholder_text="Author ID")
+        self.update_id_entry.pack(pady=5, padx=10, fill="x")
+        
+        ctk.CTkButton(self.update_frame, text="Load Author", command=self.load_author).pack(pady=5)
+        
+        self.update_name_entry = ctk.CTkEntry(self.update_frame, placeholder_text="New Name")
+        self.update_name_entry.pack(pady=5, padx=10, fill="x")
+        
+        ctk.CTkButton(self.update_frame, text="Update", command=self.update_author).pack(pady=10)
+        
         # Delete Form
         self.delete_frame = ctk.CTkFrame(self.left_container)
         self.delete_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
         
         ctk.CTkLabel(self.delete_frame, text="Delete Author", font=("Arial", 16, "bold")).pack(pady=5)
+        
+        self.delete_id_entry = ctk.CTkEntry(self.delete_frame, placeholder_text="Author ID")
+        self.delete_id_entry.pack(pady=5, padx=10, fill="x")
+        
+        ctk.CTkButton(self.delete_frame, text="Delete", command=self.delete_author, 
+                     fg_color="#FF5252", hover_color="#FF0000").pack(pady=10)
 
         # Search Form
         self.search_frame = ctk.CTkFrame(self.left_container)
         self.search_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
         
         ctk.CTkLabel(self.search_frame, text="Search Authors", font=("Arial", 16, "bold")).pack(pady=5)
+        
+        self.search_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Search by name...")
+        self.search_entry.pack(pady=5, padx=10, fill="x")
+        
+        ctk.CTkButton(self.search_frame, text="Search", command=self.search_authors).pack(pady=10)
+        ctk.CTkButton(self.search_frame, text="Clear Search", command=self.clear_search).pack(pady=5)
         
         # Right side - Table
         self.table_frame = ctk.CTkFrame(self)
@@ -77,6 +104,9 @@ class AuthorPage(ctk.CTkFrame):
         # Show create form by default
         self.show_form("create")
         
+        # Load initial data
+        self.refresh_table()
+        
     def show_form(self, form_type):
         # Hide all forms first
         self.create_frame.grid_remove()
@@ -93,3 +123,172 @@ class AuthorPage(ctk.CTkFrame):
             self.delete_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
         elif form_type == "search":
             self.search_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
+    
+    def create_author(self):
+        try:
+            name = self.name_entry.get()
+            
+            if not name:
+                messagebox.showerror("Error", "All fields are required")
+                return
+            
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                INSERT INTO authors (name)
+                VALUES (?)
+            """, (name,))
+            
+            conn.commit()
+            conn.close()
+            
+            self.clear_create_entries()
+            self.refresh_table()
+            messagebox.showinfo("Success", "Author created successfully")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error creating author: {e}")
+    
+    def load_author(self):
+        try:
+            author_id = self.update_id_entry.get()
+            if not author_id:
+                messagebox.showerror("Error", "Please enter a author ID")
+                return
+            
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT name
+                FROM authors
+                WHERE id = ?
+            """, (int(author_id),))
+            
+            author = cursor.fetchone()
+            conn.close()
+            
+            if author:
+                self.update_name_entry.delete(0, 'end')
+                self.update_name_entry.insert(0, author[0])
+            else:
+                messagebox.showerror("Error", "Author not found")
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Error loading author: {e}")
+    
+    def update_author(self):
+        try:
+            author_id = self.update_id_entry.get()
+            new_name = self.update_name_entry.get()
+            
+            if not all([author_id, new_name]):
+                 messagebox.showerror("Error", "All fields are required")
+                 return
+            
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                UPDATE authors
+                SET name = ?
+                WHERE id = ?
+            """, (new_name, int(author_id)))
+            
+            conn.commit()
+            conn.close()
+            
+            self.clear_update_entries()
+            self.refresh_table()
+            messagebox.showinfo("Success", "Author updated successfully")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error updating author: {e}")
+    
+    def delete_author(self):
+        try:
+            author_id = self.delete_id_entry.get()
+            if not author_id:
+                messagebox.showerror("Error", "Please enter a author ID")
+                return
+            
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                DELETE FROM authors WHERE id = ?
+            """, (int(author_id),))
+            
+            conn.commit()
+            conn.close()
+            
+            self.delete_id_entry.delete(0, 'end')
+            self.refresh_table()
+            messagebox.showinfo("Success", "Author deleted successfully")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error deleting author: {e}")
+    
+    def refresh_table(self):
+        # Clear the current table
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+            
+        try:
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            # Get authors
+            cursor.execute("""
+                SELECT id, name
+                FROM authors
+            """)
+            
+            for row in cursor.fetchall():
+                self.tree.insert('', 'end', values=row)
+                
+            conn.close()
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error refreshing table: {e}")
+    
+    def clear_create_entries(self):
+        self.name_entry.delete(0, 'end')
+    
+    def clear_update_entries(self):
+        self.update_id_entry.delete(0, 'end')
+        self.update_name_entry.delete(0, 'end')
+
+    def search_authors(self):
+        try:
+            search_term = self.search_entry.get().strip().lower()
+            
+            # Clear the current table
+            for item in self.tree.get_children():
+                self.tree.delete(item)
+                
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            # Get authors with filters
+            query = """
+                SELECT id, name
+                FROM authors
+                WHERE LOWER(name) LIKE ?
+            """
+            
+            search_pattern = f"%{search_term}%"
+            cursor.execute(query, (search_pattern,))
+            
+            for row in cursor.fetchall():
+                self.tree.insert('', 'end', values=row)
+                
+            conn.close()
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error searching authors: {e}")
+            
+    def clear_search(self):
+        self.search_entry.delete(0, 'end')
+        self.refresh_table()
