@@ -63,6 +63,15 @@ class AuthorPage(ctk.CTkFrame):
         self.update_name_entry = ctk.CTkEntry(self.update_frame, placeholder_text="New Name")
         self.update_name_entry.pack(pady=5, padx=10, fill="x")
         
+        self.update_phone_number_entry = ctk.CTkEntry(self.update_frame, placeholder_text="New Phone Number")
+        self.update_phone_number_entry.pack(pady=5, padx=10, fill="x")
+        
+        self.update_email_entry = ctk.CTkEntry(self.update_frame, placeholder_text="New Email")
+        self.update_email_entry.pack(pady=5, padx=10, fill="x")
+        
+        self.update_description_entry = ctk.CTkEntry(self.update_frame, placeholder_text="New Description")
+        self.update_description_entry.pack(pady=5, padx=10, fill="x")
+        
         ctk.CTkButton(self.update_frame, text="Update", command=self.update_author).pack(pady=10)
         
         # Delete Form
