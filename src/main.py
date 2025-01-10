@@ -31,7 +31,7 @@ class LibraryApp(ctk.CTk):
         # Navigation frame
         self.navigation_frame = ctk.CTkFrame(self, corner_radius=0)
         self.navigation_frame.grid(row=0, column=0, sticky="nsew")
-        self.navigation_frame.grid_rowconfigure(5, weight=1)
+        self.navigation_frame.grid_rowconfigure(8, weight=1)
 
         self.navigation_label = ctk.CTkLabel(self.navigation_frame, text="  Navigation Menu  ",
                                                  compound="left", font=ctk.CTkFont(size=15, weight="bold"))
