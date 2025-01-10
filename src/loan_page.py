@@ -164,11 +164,13 @@ class LoanPage(ctk.CTkFrame):
         self.user_tree.column('Name', width=200)
         
         # Book Table
-        self.book_tree = ttk.Treeview(self.info_table_frame, columns=('ID', 'Name'), show='headings')
+        self.book_tree = ttk.Treeview(self.info_table_frame, columns=('ID', 'Name', 'Available'), show='headings')
         self.book_tree.heading('ID', text='Book ID')
         self.book_tree.heading('Name', text='Book Name')
+        self.book_tree.heading('Available', text='Available')
         self.book_tree.column('ID', width=100)
         self.book_tree.column('Name', width=200)
+        self.book_tree.column('Available', width=100)
         
         # Pack the tables
         self.user_tree.pack(side="left", fill="both", expand=True)
@@ -397,11 +399,11 @@ class LoanPage(ctk.CTkFrame):
             
             # Get books
             cursor.execute("""
-                SELECT id, title FROM books
+                SELECT id, title, available FROM books
             """)
             
             for row in cursor.fetchall():
-                self.book_tree.insert('', 'end', values=row)
+                self.book_tree.insert('', 'end', values=(row[0], row[1], row[2]))
                 
             conn.close()
             
