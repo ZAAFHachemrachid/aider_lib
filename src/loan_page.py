@@ -107,7 +107,7 @@ class LoanPage(ctk.CTkFrame):
         
         ctk.CTkLabel(self.search_user_frame, text="Search Users", font=("Arial", 16, "bold")).pack(pady=5)
         
-        self.search_user_id_entry = ctk.CTkEntry(self.search_user_frame, placeholder_text="User ID")
+        self.search_user_id_entry = ctk.CTkEntry(self.search_user_frame, placeholder_text="Search by user ID or name...")
         self.search_user_id_entry.pack(pady=5, padx=10, fill="x")
         
         ctk.CTkButton(self.search_user_frame, text="Search", command=self.search_users).pack(pady=5)
@@ -118,7 +118,7 @@ class LoanPage(ctk.CTkFrame):
         
         ctk.CTkLabel(self.search_book_frame, text="Search Books", font=("Arial", 16, "bold")).pack(pady=5)
         
-        self.search_book_id_entry = ctk.CTkEntry(self.search_book_frame, placeholder_text="Book ID")
+        self.search_book_id_entry = ctk.CTkEntry(self.search_book_frame, placeholder_text="Search by book ID or title...")
         self.search_book_id_entry.pack(pady=5, padx=10, fill="x")
         
         ctk.CTkButton(self.search_book_frame, text="Search", command=self.search_books).pack(pady=5)
@@ -473,13 +473,14 @@ class LoanPage(ctk.CTkFrame):
             cursor = conn.cursor()
             
             query = """
-                SELECT id, name FROM users WHERE 1=1
+                SELECT id, name FROM users
+                WHERE CAST(id AS TEXT) LIKE ? OR LOWER(name) LIKE ?
             """
             params = []
             
-            if user_id:
-                query += " AND id = ?"
-                params.append(int(user_id))
+            search_pattern = f"%{user_id}%"
+            params.append(search_pattern)
+            params.append(search_pattern)
             
             cursor.execute(query, params)
             
@@ -503,13 +504,14 @@ class LoanPage(ctk.CTkFrame):
             cursor = conn.cursor()
             
             query = """
-                SELECT id, title FROM books WHERE 1=1
+                SELECT id, title FROM books
+                WHERE CAST(id AS TEXT) LIKE ? OR LOWER(title) LIKE ?
             """
             params = []
             
-            if book_id:
-                query += " AND id = ?"
-                params.append(int(book_id))
+            search_pattern = f"%{book_id}%"
+            params.append(search_pattern)
+            params.append(search_pattern)
             
             cursor.execute(query, params)
             
