@@ -103,7 +103,7 @@ class LoanPage(ctk.CTkFrame):
         self.loan_table_frame.grid_rowconfigure(0, weight=1)
         self.loan_table_frame.grid_columnconfigure(0, weight=1)
         
-        columns = ('ID', 'User ID', 'Book ID', 'Loan Date', 'Due Date', 'Return Date')
+        columns = ('ID', 'User ID', 'Book ID', 'Borrow Date', 'Due Date', 'Return Date', 'Loan Date')
         self.loan_tree = ttk.Treeview(self.loan_table_frame, columns=columns, show='headings')
         
         # Define headings
@@ -173,12 +173,12 @@ class LoanPage(ctk.CTkFrame):
             conn = create_connection()
             cursor = conn.cursor()
             
-            loan_date = date.today().strftime("%Y-%m-%d")
+            borrow_date = date.today().strftime("%Y-%m-%d")
             
             cursor.execute("""
-                INSERT INTO loans (user_id, book_id, loan_date, due_date)
+                INSERT INTO loans (user_id, book_id, borrow_date, due_date)
                 VALUES (?, ?, ?, ?)
-            """, (int(user_id), int(book_id), loan_date, due_date))
+            """, (int(user_id), int(book_id), borrow_date, due_date))
             
             # Update book availability
             cursor.execute("""
@@ -247,7 +247,7 @@ class LoanPage(ctk.CTkFrame):
             
             # Get loans
             cursor.execute("""
-                SELECT id, user_id, book_id, loan_date, due_date, return_date
+                SELECT id, user_id, book_id, borrow_date, due_date, return_date, loan_date
                 FROM loans
             """)
             
@@ -292,7 +292,7 @@ class LoanPage(ctk.CTkFrame):
             cursor = conn.cursor()
             
             query = """
-                SELECT id, user_id, book_id, loan_date, due_date, return_date
+                SELECT id, user_id, book_id, borrow_date, due_date, return_date, loan_date
                 FROM loans
                 WHERE 1=1
             """
