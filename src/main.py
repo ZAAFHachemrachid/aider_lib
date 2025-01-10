@@ -84,13 +84,13 @@ class LibraryApp(ctk.CTk):
         self.home_label.pack(pady=20)
         
         # Labels for counts
-        self.active_loans_label = ctk.CTkLabel(self.home_page, text="Active Loans: 0")
+        self.active_loans_label = ctk.CTkLabel(self.home_page, text="Active Loans: 0", fg_color=self.bg_color)
         self.active_loans_label.pack(pady=5)
         
-        self.total_books_label = ctk.CTkLabel(self.home_page, text="Total Books: 0")
+        self.total_books_label = ctk.CTkLabel(self.home_page, text="Total Books: 0", fg_color=self.bg_color)
         self.total_books_label.pack(pady=5)
         
-        self.available_books_label = ctk.CTkLabel(self.home_page, text="Available Books: 0")
+        self.available_books_label = ctk.CTkLabel(self.home_page, text="Available Books: 0", fg_color=self.bg_color)
         self.available_books_label.pack(pady=5)
         
         # Chart frame
