@@ -262,12 +262,12 @@ class LoanPage(ctk.CTkFrame):
             elif form_type == "book":
                 self.search_book_frame.grid(row=5, column=0, pady=10, padx=10, sticky="nsew")
     
-        def return_loan(self):
-            try:
-                loan_id = self.loan_id_entry.get()
-                if not loan_id:
-                    messagebox.showerror("Error", "Please enter a loan ID")
-                    return
+    def return_loan(self):
+        try:
+            loan_id = self.loan_id_entry.get()
+            if not loan_id:
+                messagebox.showerror("Error", "Please enter a loan ID")
+                return
             
             conn = create_connection()
             cursor = conn.cursor()
@@ -277,6 +277,11 @@ class LoanPage(ctk.CTkFrame):
             # Get loan details
             cursor.execute("SELECT due_date, book_id FROM loans WHERE id = ?", (int(loan_id),))
             loan = cursor.fetchone()
+            
+            if not loan:
+                messagebox.showerror("Error", "Loan not found")
+                return
+                
             due_date_str = loan[0]
             book_id = loan[1]
             
@@ -297,7 +302,7 @@ class LoanPage(ctk.CTkFrame):
             cursor.execute("UPDATE loans SET return_date = ? WHERE id = ?", (return_date, int(loan_id)))
             
             # Update book availability
-            cursor.execute("UPDATE books SET available = available + 1 WHERE id = ?", (int(book_id),))
+            cursor.execute("UPDATE books SET available = available + 1 WHERE id = ?", (book_id,))
             
             conn.commit()
             conn.close()
@@ -308,7 +313,7 @@ class LoanPage(ctk.CTkFrame):
             
         except Exception as e:
             messagebox.showerror("Error", f"Error returning book: {e}")
-    
+
     def load_loan(self):
         try:
             loan_id = self.loan_id_update_entry.get()
@@ -405,7 +410,7 @@ class LoanPage(ctk.CTkFrame):
         except Exception as e:
             messagebox.showerror("Error", f"Error deleting loan: {e}")
         
-        def refresh_table(self):
+    def refresh_table(self):
         # Clear the current tables
         for item in self.loan_tree.get_children():
             self.loan_tree.delete(item)
