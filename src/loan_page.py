@@ -43,6 +43,9 @@ class LoanPage(ctk.CTkFrame):
         self.book_id_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Book ID")
         self.book_id_entry.pack(pady=5, padx=10, fill="x")
         
+        self.due_date_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Due Date (YYYY-MM-DD)")
+        self.due_date_entry.pack(pady=5, padx=10, fill="x")
+        
         ctk.CTkButton(self.create_frame, text="Create Loan", command=self.create_loan).pack(pady=10)
         
         # Return Loan Form
