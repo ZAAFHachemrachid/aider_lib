@@ -266,8 +266,8 @@ class LoanPage(ctk.CTkFrame):
             try:
                 loan_id = self.loan_id_entry.get()
                 if not loan_id:
-                messagebox.showerror("Error", "Please enter a loan ID")
-                return
+                    messagebox.showerror("Error", "Please enter a loan ID")
+                    return
             
             conn = create_connection()
             cursor = conn.cursor()
