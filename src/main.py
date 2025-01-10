@@ -7,6 +7,8 @@ from customtkinter import CTkScrollableFrame
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from src.author_page import AuthorPage
+from src.database import create_connection
+from tkinter import messagebox
 from src.category_page import CategoryPage
 from src.admin_user_page import AdminUserPage
 from src.book_page import BookPage
