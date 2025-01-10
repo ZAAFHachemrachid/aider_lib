@@ -118,7 +118,7 @@ class BookPage(ctk.CTkFrame):
         self.table_frame.grid_rowconfigure(0, weight=1)
         self.table_frame.grid_columnconfigure(0, weight=1)
         
-        columns = ('ID', 'Title', 'Author ID', 'Category ID', 'ISBN', 'Available', 'Quantity')
+        columns = ('ID', 'Title', 'Author ID', 'Category ID', 'ISBN', 'Available', 'Quantity', 'Total')
         self.tree = ttk.Treeview(self.table_frame, columns=columns, show='headings')
         
         # Define headings
@@ -295,7 +295,7 @@ class BookPage(ctk.CTkFrame):
             """)
             
             for row in cursor.fetchall():
-                self.tree.insert('', 'end', values=row)
+                self.tree.insert('', 'end', values=(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[6]))
                 
             conn.close()
             
