@@ -314,11 +314,11 @@ class AuthorPage(ctk.CTkFrame):
             query = """
                 SELECT id, name, phone_number, email, description
                 FROM authors
-                WHERE LOWER(name) LIKE ?
+                WHERE LOWER(name) LIKE ? OR LOWER(phone_number) LIKE ? OR LOWER(email) LIKE ? OR LOWER(description) LIKE ?
             """
             
             search_pattern = f"%{search_term}%"
-            cursor.execute(query, (search_pattern,))
+            cursor.execute(query, (search_pattern, search_pattern, search_pattern, search_pattern))
             
             for row in cursor.fetchall():
                 self.tree.insert('', 'end', values=row)

@@ -304,11 +304,11 @@ class AdminUserPage(ctk.CTkFrame):
                 query = """
                     SELECT id, username, password, name, role, approved
                     FROM users
-                    WHERE LOWER(username) LIKE ?
+                    WHERE LOWER(username) LIKE ? OR LOWER(password) LIKE ? OR LOWER(name) LIKE ? OR LOWER(role) LIKE ?
                 """
                 
                 search_pattern = f"%{search_term}%"
-                cursor.execute(query, (search_pattern,))
+                cursor.execute(query, (search_pattern, search_pattern, search_pattern, search_pattern))
                 
                 for row in cursor.fetchall():
                     self.page.tree.insert('', 'end', values=row)
