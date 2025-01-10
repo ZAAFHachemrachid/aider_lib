@@ -442,13 +442,14 @@ class LoanPage(ctk.CTkFrame):
             query = """
                 SELECT id, user_id, book_id, borrow_date, due_date, return_date, loan_date
                 FROM loans
-                WHERE 1=1
+                WHERE CAST(id AS TEXT) LIKE ? OR CAST(user_id AS TEXT) LIKE ? OR CAST(book_id AS TEXT) LIKE ?
             """
             params = []
             
-            if loan_id:
-                query += " AND id = ?"
-                params.append(int(loan_id))
+            search_pattern = f"%{loan_id}%"
+            params.append(search_pattern)
+            params.append(search_pattern)
+            params.append(search_pattern)
             
             cursor.execute(query, params)
             

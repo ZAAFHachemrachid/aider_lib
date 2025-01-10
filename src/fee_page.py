@@ -309,11 +309,11 @@ class FeePage(ctk.CTkFrame):
             query = """
                 SELECT id, loan_id, amount, paid
                 FROM fees
-                WHERE CAST(loan_id AS TEXT) LIKE ?
+                WHERE CAST(loan_id AS TEXT) LIKE ? OR CAST(amount AS TEXT) LIKE ?
             """
             
             search_pattern = f"%{search_term}%"
-            cursor.execute(query, (search_pattern,))
+            cursor.execute(query, (search_pattern, search_pattern))
             
             for row in cursor.fetchall():
                 self.tree.insert('', 'end', values=row)

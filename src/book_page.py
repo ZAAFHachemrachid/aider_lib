@@ -332,11 +332,11 @@ class BookPage(ctk.CTkFrame):
             query = """
                 SELECT id, title, author_id, category_id, isbn, available, quantity_book
                 FROM books
-                WHERE LOWER(title) LIKE ? OR LOWER(isbn) LIKE ?
+                WHERE LOWER(title) LIKE ? OR LOWER(author_id) LIKE ? OR LOWER(category_id) LIKE ? OR LOWER(isbn) LIKE ?
             """
             
             search_pattern = f"%{search_term}%"
-            cursor.execute(query, (search_pattern, search_pattern))
+            cursor.execute(query, (search_pattern, search_pattern, search_pattern, search_pattern))
             
             for row in cursor.fetchall():
                 self.tree.insert('', 'end', values=row)

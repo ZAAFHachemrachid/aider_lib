@@ -301,7 +301,7 @@ class CategoryPage(ctk.CTkFrame):
             query = """
                 SELECT id, name, description
                 FROM categories
-                WHERE LOWER(name) LIKE ?
+                WHERE LOWER(name) LIKE ? OR LOWER(description) LIKE ?
                 ORDER BY name
             """
             
