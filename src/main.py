@@ -74,12 +74,6 @@ class LibraryApp(ctk.CTk):
                                                    command=self.show_loan_page)
         self.loan_button.grid(row=6, column=0, sticky="ew")
         
-        self.fee_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Fees",
-                                                   fg_color="transparent", text_color=("gray10", "gray90"),
-                                                   hover_color=("gray70", "gray30"),
-                                                   command=self.show_fee_page)
-        self.fee_button.grid(row=7, column=0, sticky="ew")
-
         self.exit_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Exit",
                                                    fg_color="transparent", text_color=("gray10", "gray90"),
                                                    hover_color=("gray70", "gray30"),
