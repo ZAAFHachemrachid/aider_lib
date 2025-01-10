@@ -17,6 +17,7 @@ def seed_data():
 
     # Seed users
     users = [
+        ('r', 'r', 'Admin User', 'admin', 1),
         ('admin', 'admin123', 'Admin User', 'admin', 1),
         ('user1', 'user123', 'Regular User 1', 'user', 1),
         ('user2', 'user123', 'Regular User 2', 'user', 0)
