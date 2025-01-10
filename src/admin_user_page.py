@@ -82,7 +82,7 @@ class AdminUserPage(ctk.CTkFrame):
             self.name_entry = ctk.CTkEntry(self, placeholder_text="Name")
             self.name_entry.pack(pady=5, padx=10, fill="x")
             
-            self.role_entry = ctk.CTkEntry(self, placeholder_text="Role (user/admin)")
+            self.role_entry = ctk.CTkComboBox(self, values=["admin", "student", "teacher"])
             self.role_entry.pack(pady=5, padx=10, fill="x")
             
             self.approved_var = ctk.BooleanVar(value=False)
@@ -150,7 +150,7 @@ class AdminUserPage(ctk.CTkFrame):
             self.name_entry = ctk.CTkEntry(self, placeholder_text="New Name")
             self.name_entry.pack(pady=5, padx=10, fill="x")
             
-            self.role_entry = ctk.CTkEntry(self, placeholder_text="New Role (user/admin)")
+            self.role_entry = ctk.CTkComboBox(self, values=["admin", "student", "teacher"])
             self.role_entry.pack(pady=5, padx=10, fill="x")
             
             self.approved_var = ctk.BooleanVar()
