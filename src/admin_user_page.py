@@ -4,6 +4,8 @@ from tkinter import ttk, messagebox
 from database import create_connection
 from src.admin_user_create_form import AdminUserCreateForm
 from src.admin_user_delete_form import AdminUserDeleteForm
+from src.admin_user_update_form import AdminUserUpdateForm
+from src.admin_user_search_form import AdminUserSearchForm
 
 
 class AdminUserPage(ctk.CTkFrame):
