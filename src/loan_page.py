@@ -89,10 +89,14 @@ class LoanPage(ctk.CTkFrame):
         
         ctk.CTkButton(self.delete_frame, text="Delete Loan", command=self.delete_loan, 
                      fg_color="#FF5252", hover_color="#FF0000").pack(pady=10)
-        
         # Search Forms
+        self.search_forms_frame = ctk.CTkFrame(self.left_container)
+        self.search_forms_frame.grid(row=2, column=0, pady=5, padx=10, sticky="ew")
+        self.search_forms_frame.grid_columnconfigure((0,1,2), weight=1)
+        
+        # Loan Search Form
         self.search_loan_frame = ctk.CTkFrame(self.left_container)
-        self.search_loan_frame.grid(row=2, column=0, pady=10, padx=10, sticky="nsew")
+        self.search_loan_frame.grid(row=3, column=0, pady=10, padx=10, sticky="nsew")
         
         ctk.CTkLabel(self.search_loan_frame, text="Search Loans", font=("Arial", 16, "bold")).pack(pady=5)
         
@@ -102,8 +106,9 @@ class LoanPage(ctk.CTkFrame):
         ctk.CTkButton(self.search_loan_frame, text="Search", command=self.search_loans).pack(pady=5)
         ctk.CTkButton(self.search_loan_frame, text="Reset", command=self.reset_loan_search).pack(pady=5)
         
+        # User Search Form
         self.search_user_frame = ctk.CTkFrame(self.left_container)
-        self.search_user_frame.grid(row=3, column=0, pady=10, padx=10, sticky="nsew")
+        self.search_user_frame.grid(row=4, column=0, pady=10, padx=10, sticky="nsew")
         
         ctk.CTkLabel(self.search_user_frame, text="Search Users", font=("Arial", 16, "bold")).pack(pady=5)
         
@@ -113,8 +118,9 @@ class LoanPage(ctk.CTkFrame):
         ctk.CTkButton(self.search_user_frame, text="Search", command=self.search_users).pack(pady=5)
         ctk.CTkButton(self.search_user_frame, text="Reset", command=self.reset_user_search).pack(pady=5)
         
+        # Book Search Form
         self.search_book_frame = ctk.CTkFrame(self.left_container)
-        self.search_book_frame.grid(row=4, column=0, pady=10, padx=10, sticky="nsew")
+        self.search_book_frame.grid(row=5, column=0, pady=10, padx=10, sticky="nsew")
         
         ctk.CTkLabel(self.search_book_frame, text="Search Books", font=("Arial", 16, "bold")).pack(pady=5)
         
@@ -123,6 +129,11 @@ class LoanPage(ctk.CTkFrame):
         
         ctk.CTkButton(self.search_book_frame, text="Search", command=self.search_books).pack(pady=5)
         ctk.CTkButton(self.search_book_frame, text="Reset", command=self.reset_book_search).pack(pady=5)
+        
+        # Create buttons to switch between search forms
+        ctk.CTkButton(self.search_forms_frame, text="Search Loans", command=lambda: self.show_search_form("loan")).grid(row=0, column=0, padx=2, sticky="ew")
+        ctk.CTkButton(self.search_forms_frame, text="Search Users", command=lambda: self.show_search_form("user")).grid(row=0, column=1, padx=2, sticky="ew")
+        ctk.CTkButton(self.search_forms_frame, text="Search Books", command=lambda: self.show_search_form("book")).grid(row=0, column=2, padx=2, sticky="ew")
         
         # Right side - Tables
         self.table_container = ctk.CTkFrame(self)
@@ -233,11 +244,25 @@ class LoanPage(ctk.CTkFrame):
             self.clear_create_entries()
             self.refresh_table()
             messagebox.showinfo("Success", "Loan created successfully")
-            
+        
         except Exception as e:
             messagebox.showerror("Error", f"Error creating loan: {e}")
+        
+        def show_search_form(self, form_type):
+            # Hide all forms first
+            self.search_loan_frame.grid_remove()
+            self.search_user_frame.grid_remove()
+            self.search_book_frame.grid_remove()
+        
+            # Show the selected form
+            if form_type == "loan":
+                self.search_loan_frame.grid(row=3, column=0, pady=10, padx=10, sticky="nsew")
+            elif form_type == "user":
+                self.search_user_frame.grid(row=4, column=0, pady=10, padx=10, sticky="nsew")
+            elif form_type == "book":
+                self.search_book_frame.grid(row=5, column=0, pady=10, padx=10, sticky="nsew")
     
-    def return_loan(self):
+        def return_loan(self):
         try:
             loan_id = self.loan_id_entry.get()
             if not loan_id:
@@ -376,11 +401,11 @@ class LoanPage(ctk.CTkFrame):
             self.clear_delete_entries()
             self.refresh_table()
             messagebox.showinfo("Success", "Loan deleted successfully")
-            
+        
         except Exception as e:
             messagebox.showerror("Error", f"Error deleting loan: {e}")
-    
-    def refresh_table(self):
+        
+        def refresh_table(self):
         # Clear the current tables
         for item in self.loan_tree.get_children():
             self.loan_tree.delete(item)
@@ -534,7 +559,7 @@ class LoanPage(ctk.CTkFrame):
     def reset_book_search(self):
         self.search_book_id_entry.delete(0, 'end')
         self.refresh_table()
-    
+        
     def clear_update_entries(self):
         self.loan_id_update_entry.delete(0, 'end')
         self.user_id_update_entry.delete(0, 'end')
@@ -545,3 +570,6 @@ class LoanPage(ctk.CTkFrame):
     
     def clear_return_entries(self):
         self.loan_id_entry.delete(0, 'end')
+        
+        # Show loan search form by default
+        self.show_search_form("loan")
