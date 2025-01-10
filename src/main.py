@@ -306,6 +306,14 @@ class LibraryApp(ctk.CTk):
         self.signup_page.grid(row=0, column=0, sticky="nsew")
         self.signup_page.grid_remove()
 
+    def show_signup_page(self):
+        self.login_page.grid_remove()
+        self.signup_page.grid(row=0, column=0, sticky="nsew")
+        
+    def show_login_page(self):
+        self.signup_page.grid_remove()
+        self.login_page.grid(row=0, column=0, sticky="nsew")
+
 if __name__ == "__main__":
     app = LibraryApp()
     app.mainloop()
