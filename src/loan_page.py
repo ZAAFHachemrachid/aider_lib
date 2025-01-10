@@ -43,9 +43,6 @@ class LoanPage(ctk.CTkFrame):
         self.book_id_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Book ID")
         self.book_id_entry.pack(pady=5, padx=10, fill="x")
         
-        self.due_date_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Due Date (YYYY-MM-DD)")
-        self.due_date_entry.pack(pady=5, padx=10, fill="x")
-        
         ctk.CTkButton(self.create_frame, text="Create Loan", command=self.create_loan).pack(pady=10)
         
         # Return Loan Form
@@ -58,6 +55,26 @@ class LoanPage(ctk.CTkFrame):
         self.loan_id_entry.pack(pady=5, padx=10, fill="x")
         
         ctk.CTkButton(self.return_frame, text="Return Book", command=self.return_loan).pack(pady=10)
+        
+        # Update Loan Form
+        self.update_frame = ctk.CTkFrame(self.left_container)
+        self.update_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
+        
+        ctk.CTkLabel(self.update_frame, text="Update Loan", font=("Arial", 16, "bold")).pack(pady=5)
+        
+        self.loan_id_update_entry = ctk.CTkEntry(self.update_frame, placeholder_text="Loan ID")
+        self.loan_id_update_entry.pack(pady=5, padx=10, fill="x")
+        
+        ctk.CTkButton(self.update_frame, text="Load Loan", command=self.load_loan).pack(pady=5)
+        
+        self.user_id_update_entry = ctk.CTkEntry(self.update_frame, placeholder_text="User ID")
+        self.user_id_update_entry.pack(pady=5, padx=10, fill="x")
+        
+        self.book_id_update_entry = ctk.CTkEntry(self.update_frame, placeholder_text="Book ID")
+        self.book_id_update_entry.pack(pady=5, padx=10, fill="x")
+        
+        ctk.CTkButton(self.update_frame, text="Update Loan", command=self.update_loan).pack(pady=10)
+        
         # Search Forms
         self.search_loan_frame = ctk.CTkFrame(self.left_container)
         self.search_loan_frame.grid(row=2, column=0, pady=10, padx=10, sticky="nsew")
@@ -155,12 +172,15 @@ class LoanPage(ctk.CTkFrame):
         # Hide all forms first
         self.create_frame.grid_remove()
         self.return_frame.grid_remove()
+        self.update_frame.grid_remove()
         
         # Show the selected form
         if form_type == "create":
             self.create_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
         elif form_type == "return":
             self.return_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
+        elif form_type == "update":
+            self.update_frame.grid(row=1, column=0, pady=10, padx=10, sticky="nsew")
     
     def create_loan(self):
         try:
@@ -233,6 +253,65 @@ class LoanPage(ctk.CTkFrame):
             
         except Exception as e:
             messagebox.showerror("Error", f"Error returning book: {e}")
+    
+    def load_loan(self):
+        try:
+            loan_id = self.loan_id_update_entry.get()
+            if not loan_id:
+                messagebox.showerror("Error", "Please enter a loan ID")
+                return
+            
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT user_id, book_id
+                FROM loans
+                WHERE id = ?
+            """, (int(loan_id),))
+            
+            loan = cursor.fetchone()
+            conn.close()
+            
+            if loan:
+                self.user_id_update_entry.delete(0, 'end')
+                self.user_id_update_entry.insert(0, loan[0])
+                self.book_id_update_entry.delete(0, 'end')
+                self.book_id_update_entry.insert(0, loan[1])
+            else:
+                messagebox.showerror("Error", "Loan not found")
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Error loading loan: {e}")
+    
+    def update_loan(self):
+        try:
+            loan_id = self.loan_id_update_entry.get()
+            user_id = self.user_id_update_entry.get()
+            book_id = self.book_id_update_entry.get()
+            
+            if not all([loan_id, user_id, book_id]):
+                messagebox.showerror("Error", "All fields are required")
+                return
+            
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                UPDATE loans
+                SET user_id = ?, book_id = ?
+                WHERE id = ?
+            """, (int(user_id), int(book_id), int(loan_id)))
+            
+            conn.commit()
+            conn.close()
+            
+            self.clear_update_entries()
+            self.refresh_table()
+            messagebox.showinfo("Success", "Loan updated successfully")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error updating loan: {e}")
     
     def refresh_table(self):
         # Clear the current tables
@@ -385,6 +464,11 @@ class LoanPage(ctk.CTkFrame):
     def reset_book_search(self):
         self.search_book_id_entry.delete(0, 'end')
         self.refresh_table()
+    
+    def clear_update_entries(self):
+        self.loan_id_update_entry.delete(0, 'end')
+        self.user_id_update_entry.delete(0, 'end')
+        self.book_id_update_entry.delete(0, 'end')
     
     def clear_return_entries(self):
         self.loan_id_entry.delete(0, 'end')
