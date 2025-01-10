@@ -10,13 +10,14 @@ class LoanPage(ctk.CTkFrame):
         
         # Configure grid
         self.grid_columnconfigure(0, weight=2)  # Left side (forms)
-        self.grid_columnconfigure(1, weight=3)  # Right side (table)
-        self.grid_rowconfigure(0, weight=1)  # Make row expandable
+        self.grid_columnconfigure(1, weight=3)  # Right side (tables)
+        self.grid_rowconfigure(0, weight=1)  # Top row for loan table
+        self.grid_rowconfigure(1, weight=1)  # Bottom row for user/book tables
         
         # Left side container
         self.left_container = ctk.CTkFrame(self)
-        self.left_container.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.left_container.grid_rowconfigure(1, weight=1)  # Make forms row expandable
+        self.left_container.grid(row=0, column=0, padx=10, pady=10, sticky="nsew", rowspan=2)
+        self.left_container.grid_rowconfigure(2, weight=1)  # Make forms row expandable
         self.left_container.grid_columnconfigure(0, weight=1)
         
         # Buttons Frame for switching forms
@@ -56,27 +57,75 @@ class LoanPage(ctk.CTkFrame):
         
         ctk.CTkButton(self.return_frame, text="Return Book", command=self.return_loan).pack(pady=10)
         
-        # Right side - Table
-        self.table_frame = ctk.CTkFrame(self)
-        self.table_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
-        self.table_frame.grid_rowconfigure(0, weight=1)
-        self.table_frame.grid_columnconfigure(0, weight=1)
+        # Search Form
+        self.search_frame = ctk.CTkFrame(self.left_container)
+        self.search_frame.grid(row=2, column=0, pady=10, padx=10, sticky="nsew")
+        
+        ctk.CTkLabel(self.search_frame, text="Search", font=("Arial", 16, "bold")).pack(pady=5)
+        
+        self.search_loan_id_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Loan ID")
+        self.search_loan_id_entry.pack(pady=5, padx=10, fill="x")
+        
+        self.search_user_id_entry = ctk.CTkEntry(self.search_frame, placeholder_text="User ID")
+        self.search_user_id_entry.pack(pady=5, padx=10, fill="x")
+        
+        self.search_book_id_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Book ID")
+        self.search_book_id_entry.pack(pady=5, padx=10, fill="x")
+        
+        ctk.CTkButton(self.search_frame, text="Search", command=self.search_loans).pack(pady=10)
+        
+        # Right side - Tables
+        self.table_container = ctk.CTkFrame(self)
+        self.table_container.grid(row=0, column=1, padx=10, pady=10, sticky="nsew", rowspan=2)
+        self.table_container.grid_rowconfigure(0, weight=1)
+        self.table_container.grid_rowconfigure(1, weight=1)
+        self.table_container.grid_columnconfigure(0, weight=1)
+        
+        # Loan Table
+        self.loan_table_frame = ctk.CTkFrame(self.table_container)
+        self.loan_table_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.loan_table_frame.grid_rowconfigure(0, weight=1)
+        self.loan_table_frame.grid_columnconfigure(0, weight=1)
         
         columns = ('ID', 'User ID', 'Book ID', 'Loan Date', 'Due Date', 'Return Date')
-        self.tree = ttk.Treeview(self.table_frame, columns=columns, show='headings')
+        self.loan_tree = ttk.Treeview(self.loan_table_frame, columns=columns, show='headings')
         
         # Define headings
         for col in columns:
-            self.tree.heading(col, text=col)
-            self.tree.column(col, width=100)
+            self.loan_tree.heading(col, text=col)
+            self.loan_tree.column(col, width=100)
         
         # Add scrollbar
-        scrollbar = ttk.Scrollbar(self.table_frame, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=scrollbar.set)
+        scrollbar_loan = ttk.Scrollbar(self.loan_table_frame, orient="vertical", command=self.loan_tree.yview)
+        self.loan_tree.configure(yscrollcommand=scrollbar_loan.set)
         
         # Pack the table and scrollbar
-        self.tree.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        self.loan_tree.pack(side="left", fill="both", expand=True)
+        scrollbar_loan.pack(side="right", fill="y")
+        
+        # User and Book Info Table
+        self.info_table_frame = ctk.CTkFrame(self.table_container)
+        self.info_table_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+        self.info_table_frame.grid_rowconfigure(0, weight=1)
+        self.info_table_frame.grid_columnconfigure(0, weight=1)
+        
+        # User Table
+        self.user_tree = ttk.Treeview(self.info_table_frame, columns=('ID', 'Name'), show='headings')
+        self.user_tree.heading('ID', text='User ID')
+        self.user_tree.heading('Name', text='User Name')
+        self.user_tree.column('ID', width=100)
+        self.user_tree.column('Name', width=200)
+        
+        # Book Table
+        self.book_tree = ttk.Treeview(self.info_table_frame, columns=('ID', 'Name'), show='headings')
+        self.book_tree.heading('ID', text='Book ID')
+        self.book_tree.heading('Name', text='Book Name')
+        self.book_tree.column('ID', width=100)
+        self.book_tree.column('Name', width=200)
+        
+        # Pack the tables
+        self.user_tree.pack(side="left", fill="both", expand=True)
+        self.book_tree.pack(side="right", fill="both", expand=True)
         
         # Show create form by default
         self.show_form("create")
@@ -168,9 +217,13 @@ class LoanPage(ctk.CTkFrame):
             messagebox.showerror("Error", f"Error returning book: {e}")
     
     def refresh_table(self):
-        # Clear the current table
-        for item in self.tree.get_children():
-            self.tree.delete(item)
+        # Clear the current tables
+        for item in self.loan_tree.get_children():
+            self.loan_tree.delete(item)
+        for item in self.user_tree.get_children():
+            self.user_tree.delete(item)
+        for item in self.book_tree.get_children():
+            self.book_tree.delete(item)
             
         try:
             conn = create_connection()
@@ -183,7 +236,23 @@ class LoanPage(ctk.CTkFrame):
             """)
             
             for row in cursor.fetchall():
-                self.tree.insert('', 'end', values=row)
+                self.loan_tree.insert('', 'end', values=row)
+            
+            # Get users
+            cursor.execute("""
+                SELECT id, name FROM users
+            """)
+            
+            for row in cursor.fetchall():
+                self.user_tree.insert('', 'end', values=row)
+            
+            # Get books
+            cursor.execute("""
+                SELECT id, title FROM books
+            """)
+            
+            for row in cursor.fetchall():
+                self.book_tree.insert('', 'end', values=row)
                 
             conn.close()
             
@@ -194,6 +263,66 @@ class LoanPage(ctk.CTkFrame):
         self.user_id_entry.delete(0, 'end')
         self.book_id_entry.delete(0, 'end')
         self.due_date_entry.delete(0, 'end')
+    
+    def search_loans(self):
+        loan_id = self.search_loan_id_entry.get()
+        user_id = self.search_user_id_entry.get()
+        book_id = self.search_book_id_entry.get()
+        
+        # Clear the current tables
+        for item in self.loan_tree.get_children():
+            self.loan_tree.delete(item)
+        for item in self.user_tree.get_children():
+            self.user_tree.delete(item)
+        for item in self.book_tree.get_children():
+            self.book_tree.delete(item)
+        
+        try:
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            query = """
+                SELECT id, user_id, book_id, loan_date, due_date, return_date
+                FROM loans
+                WHERE 1=1
+            """
+            params = []
+            
+            if loan_id:
+                query += " AND id = ?"
+                params.append(int(loan_id))
+            if user_id:
+                query += " AND user_id = ?"
+                params.append(int(user_id))
+            if book_id:
+                query += " AND book_id = ?"
+                params.append(int(book_id))
+            
+            cursor.execute(query, params)
+            
+            for row in cursor.fetchall():
+                self.loan_tree.insert('', 'end', values=row)
+            
+            # Get users
+            cursor.execute("""
+                SELECT id, name FROM users
+            """)
+            
+            for row in cursor.fetchall():
+                self.user_tree.insert('', 'end', values=row)
+            
+            # Get books
+            cursor.execute("""
+                SELECT id, title FROM books
+            """)
+            
+            for row in cursor.fetchall():
+                self.book_tree.insert('', 'end', values=row)
+                
+            conn.close()
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error searching loans: {e}")
     
     def clear_return_entries(self):
         self.loan_id_entry.delete(0, 'end')
