@@ -3,6 +3,8 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import customtkinter as ctk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 from src.author_page import AuthorPage
 from src.category_page import CategoryPage
 from src.admin_user_page import AdminUserPage
@@ -77,6 +79,10 @@ class LibraryApp(ctk.CTk):
         self.home_page = ctk.CTkFrame(self)
         self.home_label = ctk.CTkLabel(self.home_page, text="Welcome to the Library Management System")
         self.home_label.pack(pady=20)
+        
+        # Chart frame
+        self.chart_frame = ctk.CTkFrame(self.home_page)
+        self.chart_frame.pack(pady=20, padx=20, fill="both", expand=True)
 
         # Create admin page
         self.admin_page = AdminUserPage(self, self)
@@ -109,8 +115,34 @@ class LibraryApp(ctk.CTk):
         # Show home page
         if self.user:
             self.home_page.grid(row=0, column=1, sticky="nsew")
+            self.show_book_chart()
         else:
             self.show_login_page()
+            
+    def show_book_chart(self):
+        # Create a sample chart
+        fig = Figure(figsize=(5, 4), dpi=100)
+        ax = fig.add_subplot(111)
+        
+        # Sample data (replace with actual data from your database)
+        book_counts = {
+            "Fiction": 10,
+            "Mystery": 5,
+            "Classic": 8
+        }
+        
+        categories = list(book_counts.keys())
+        counts = list(book_counts.values())
+        
+        ax.bar(categories, counts)
+        ax.set_title("Number of Books per Category")
+        ax.set_xlabel("Category")
+        ax.set_ylabel("Number of Books")
+        
+        # Embed the chart in the Tkinter frame
+        canvas = FigureCanvasTkAgg(fig, master=self.chart_frame)
+        canvas_widget = canvas.get_tk_widget()
+        canvas_widget.pack(fill="both", expand=True)
 
     def show_admin_page(self):
         # Hide all pages
