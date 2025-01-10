@@ -231,7 +231,7 @@ class AdminUserPage(ctk.CTkFrame):
             self.username_entry.delete(0, 'end')
             self.password_entry.delete(0, 'end')
             self.name_entry.delete(0, 'end')
-            self.role_entry.delete(0, 'end')
+            self.role_entry.set('')
             self.approved_var.set(False)
     
     class AdminUserDeleteForm(ctk.CTkFrame):
