@@ -43,7 +43,7 @@ class AdminUserPage(ctk.CTkFrame):
         self.table_frame.grid_rowconfigure(0, weight=1)
         self.table_frame.grid_columnconfigure(0, weight=1)
         
-        columns = ('ID', 'Username', 'Password')
+        columns = ('ID', 'Username', 'Password', 'Name', 'Role', 'Approved')
         self.tree = ttk.Treeview(self.table_frame, columns=columns, show='headings')
         
         # Define headings
@@ -79,14 +79,27 @@ class AdminUserPage(ctk.CTkFrame):
             self.password_entry = ctk.CTkEntry(self, placeholder_text="Password", show="*")
             self.password_entry.pack(pady=5, padx=10, fill="x")
             
+            self.name_entry = ctk.CTkEntry(self, placeholder_text="Name")
+            self.name_entry.pack(pady=5, padx=10, fill="x")
+            
+            self.role_entry = ctk.CTkEntry(self, placeholder_text="Role (user/admin)")
+            self.role_entry.pack(pady=5, padx=10, fill="x")
+            
+            self.approved_var = ctk.BooleanVar(value=False)
+            self.approved_checkbox = ctk.CTkCheckBox(self, text="Approved", variable=self.approved_var)
+            self.approved_checkbox.pack(pady=5, padx=10, fill="x")
+            
             ctk.CTkButton(self, text="Create", command=self.create_admin_user).pack(pady=10)
         
         def create_admin_user(self):
             try:
                 username = self.username_entry.get()
                 password = self.password_entry.get()
+                name = self.name_entry.get()
+                role = self.role_entry.get()
+                approved = int(self.approved_var.get())
                 
-                if not username or not password:
+                if not all([username, password, name, role]):
                     messagebox.showerror("Error", "All fields are required")
                     return
                 
@@ -94,9 +107,9 @@ class AdminUserPage(ctk.CTkFrame):
                 cursor = conn.cursor()
                 
                 cursor.execute("""
-                    INSERT INTO admin_users (username, password)
-                    VALUES (?, ?)
-                """, (username, password))
+                    INSERT INTO users (username, password, name, role, approved)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (username, password, name, role, approved))
                 
                 conn.commit()
                 conn.close()
@@ -111,6 +124,9 @@ class AdminUserPage(ctk.CTkFrame):
         def clear_entries(self):
             self.username_entry.delete(0, 'end')
             self.password_entry.delete(0, 'end')
+            self.name_entry.delete(0, 'end')
+            self.role_entry.delete(0, 'end')
+            self.approved_var.set(False)
     
     class AdminUserUpdateForm(ctk.CTkFrame):
         def __init__(self, parent, controller, page):
@@ -131,6 +147,16 @@ class AdminUserPage(ctk.CTkFrame):
             self.password_entry = ctk.CTkEntry(self, placeholder_text="New Password", show="*")
             self.password_entry.pack(pady=5, padx=10, fill="x")
             
+            self.name_entry = ctk.CTkEntry(self, placeholder_text="New Name")
+            self.name_entry.pack(pady=5, padx=10, fill="x")
+            
+            self.role_entry = ctk.CTkEntry(self, placeholder_text="New Role (user/admin)")
+            self.role_entry.pack(pady=5, padx=10, fill="x")
+            
+            self.approved_var = ctk.BooleanVar()
+            self.approved_checkbox = ctk.CTkCheckBox(self, text="Approved", variable=self.approved_var)
+            self.approved_checkbox.pack(pady=5, padx=10, fill="x")
+            
             ctk.CTkButton(self, text="Update", command=self.update_admin_user).pack(pady=10)
         
         def load_admin_user(self):
@@ -144,8 +170,8 @@ class AdminUserPage(ctk.CTkFrame):
                 cursor = conn.cursor()
                 
                 cursor.execute("""
-                    SELECT username, password
-                    FROM admin_users
+                    SELECT username, password, name, role, approved
+                    FROM users
                     WHERE id = ?
                 """, (int(admin_user_id),))
                 
@@ -157,6 +183,11 @@ class AdminUserPage(ctk.CTkFrame):
                     self.username_entry.insert(0, admin_user[0])
                     self.password_entry.delete(0, 'end')
                     self.password_entry.insert(0, admin_user[1])
+                    self.name_entry.delete(0, 'end')
+                    self.name_entry.insert(0, admin_user[2])
+                    self.role_entry.delete(0, 'end')
+                    self.role_entry.insert(0, admin_user[3])
+                    self.approved_var.set(bool(admin_user[4]))
                 else:
                     messagebox.showerror("Error", "Admin user not found")
                     
@@ -168,8 +199,11 @@ class AdminUserPage(ctk.CTkFrame):
                 admin_user_id = self.id_entry.get()
                 new_username = self.username_entry.get()
                 new_password = self.password_entry.get()
+                new_name = self.name_entry.get()
+                new_role = self.role_entry.get()
+                new_approved = int(self.approved_var.get())
                 
-                if not all([admin_user_id, new_username, new_password]):
+                if not all([admin_user_id, new_username, new_password, new_name, new_role]):
                     messagebox.showerror("Error", "All fields are required")
                     return
                 
@@ -177,10 +211,10 @@ class AdminUserPage(ctk.CTkFrame):
                 cursor = conn.cursor()
                 
                 cursor.execute("""
-                    UPDATE admin_users
-                    SET username = ?, password = ?
+                    UPDATE users
+                    SET username = ?, password = ?, name = ?, role = ?, approved = ?
                     WHERE id = ?
-                """, (new_username, new_password, int(admin_user_id)))
+                """, (new_username, new_password, new_name, new_role, new_approved, int(admin_user_id)))
                 
                 conn.commit()
                 conn.close()
@@ -196,6 +230,9 @@ class AdminUserPage(ctk.CTkFrame):
             self.id_entry.delete(0, 'end')
             self.username_entry.delete(0, 'end')
             self.password_entry.delete(0, 'end')
+            self.name_entry.delete(0, 'end')
+            self.role_entry.delete(0, 'end')
+            self.approved_var.set(False)
     
     class AdminUserDeleteForm(ctk.CTkFrame):
         def __init__(self, parent, controller, page):
@@ -222,7 +259,7 @@ class AdminUserPage(ctk.CTkFrame):
                 cursor = conn.cursor()
                 
                 cursor.execute("""
-                    DELETE FROM admin_users WHERE id = ?
+                    DELETE FROM users WHERE id = ?
                 """, (int(admin_user_id),))
                 
                 conn.commit()
@@ -265,8 +302,8 @@ class AdminUserPage(ctk.CTkFrame):
                 
                 # Get admin users with filters
                 query = """
-                    SELECT id, username, password
-                    FROM admin_users
+                    SELECT id, username, password, name, role, approved
+                    FROM users
                     WHERE LOWER(username) LIKE ?
                 """
                 
@@ -313,8 +350,8 @@ class AdminUserPage(ctk.CTkFrame):
             
             # Get admin users
             cursor.execute("""
-                SELECT id, username, password
-                FROM admin_users
+                SELECT id, username, password, name, role, approved
+                FROM users
             """)
             
             for row in cursor.fetchall():
