@@ -3,6 +3,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import customtkinter as ctk
+from customtkinter import CTkScrollableFrame
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from src.author_page import AuthorPage
@@ -76,9 +77,19 @@ class LibraryApp(ctk.CTk):
         self.exit_button.grid(row=7, column=0, sticky="ew")
 
         # Create pages
-        self.home_page = ctk.CTkFrame(self)
-        self.home_label = ctk.CTkLabel(self.home_page, text="Welcome to the Library Management System")
+        self.home_page = CTkScrollableFrame(self)
+        self.home_label = ctk.CTkLabel(self.home_page, text="Welcome to the Library Management System", font=("Arial", 20, "bold"))
         self.home_label.pack(pady=20)
+        
+        # Labels for counts
+        self.active_loans_label = ctk.CTkLabel(self.home_page, text="Active Loans: 0")
+        self.active_loans_label.pack(pady=5)
+        
+        self.total_books_label = ctk.CTkLabel(self.home_page, text="Total Books: 0")
+        self.total_books_label.pack(pady=5)
+        
+        self.available_books_label = ctk.CTkLabel(self.home_page, text="Available Books: 0")
+        self.available_books_label.pack(pady=5)
         
         # Chart frame
         self.chart_frame = ctk.CTkFrame(self.home_page)
@@ -116,8 +127,34 @@ class LibraryApp(ctk.CTk):
         if self.user:
             self.home_page.grid(row=0, column=1, sticky="nsew")
             self.show_book_chart()
+            self.update_home_page_labels()
         else:
             self.show_login_page()
+            
+    def update_home_page_labels(self):
+        try:
+            conn = create_connection()
+            cursor = conn.cursor()
+            
+            # Get active loans count
+            cursor.execute("SELECT COUNT(*) FROM loans WHERE return_date IS NULL")
+            active_loans = cursor.fetchone()[0]
+            self.active_loans_label.configure(text=f"Active Loans: {active_loans}")
+            
+            # Get total books count
+            cursor.execute("SELECT COUNT(*) FROM books")
+            total_books = cursor.fetchone()[0]
+            self.total_books_label.configure(text=f"Total Books: {total_books}")
+            
+            # Get available books count
+            cursor.execute("SELECT SUM(available) FROM books")
+            available_books = cursor.fetchone()[0]
+            self.available_books_label.configure(text=f"Available Books: {available_books}")
+            
+            conn.close()
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error updating home page labels: {e}")
             
     def show_book_chart(self):
         # Create a sample chart
