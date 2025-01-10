@@ -8,6 +8,7 @@ from src.category_page import CategoryPage
 from src.admin_user_page import AdminUserPage
 from src.book_page import BookPage
 from src.loan_page import LoanPage
+from src.login_page import LoginPage
 
 
 class LibraryApp(ctk.CTk):
@@ -92,7 +93,10 @@ class LibraryApp(ctk.CTk):
         # Create loan page
         self.loan_page = LoanPage(self, self)
         
-        self.show_home_page()
+        self.login_page = LoginPage(self, self)
+        self.user = None
+        
+        self.show_login_page()
 
     def show_home_page(self):
         # Hide all pages
@@ -101,8 +105,12 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
+        self.login_page.grid_remove()
         # Show home page
-        self.home_page.grid(row=0, column=1, sticky="nsew")
+        if self.user:
+            self.home_page.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.show_login_page()
 
     def show_admin_page(self):
         # Hide all pages
@@ -111,8 +119,12 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
+        self.login_page.grid_remove()
         # Show admin page
-        self.admin_page.grid(row=0, column=1, sticky="nsew")
+        if self.user and self.user[4] == 'admin':
+            self.admin_page.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.show_login_page()
 
     def show_author_page(self):
         # Hide all pages
@@ -121,8 +133,12 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
+        self.login_page.grid_remove()
         # Show author page
-        self.author_page.grid(row=0, column=1, sticky="nsew")
+        if self.user:
+            self.author_page.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.show_login_page()
         
     def show_category_page(self):
         # Hide all pages
@@ -131,8 +147,12 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
+        self.login_page.grid_remove()
         # Show category page
-        self.category_page.grid(row=0, column=1, sticky="nsew")
+        if self.user:
+            self.category_page.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.show_login_page()
         
     def show_book_page(self):
         # Hide all pages
@@ -142,8 +162,12 @@ class LibraryApp(ctk.CTk):
         self.category_page.grid_remove()
         self.book_page.grid_remove()
         self.loan_page.grid_remove()
+        self.login_page.grid_remove()
         # Show book page
-        self.book_page.grid(row=0, column=1, sticky="nsew")
+        if self.user:
+            self.book_page.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.show_login_page()
         
     def show_loan_page(self):
         # Hide all pages
@@ -152,8 +176,12 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
+        self.login_page.grid_remove()
         # Show loan page
-        self.loan_page.grid(row=0, column=1, sticky="nsew")
+        if self.user:
+            self.loan_page.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.show_login_page()
 
 if __name__ == "__main__":
     app = LibraryApp()
