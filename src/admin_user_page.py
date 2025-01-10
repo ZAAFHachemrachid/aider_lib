@@ -283,7 +283,7 @@ class AdminUserPage(ctk.CTkFrame):
             
             ctk.CTkLabel(self, text="Search Admin Users", font=("Arial", 16, "bold")).pack(pady=5)
             
-            self.search_entry = ctk.CTkEntry(self, placeholder_text="Search by username...")
+            self.search_entry = ctk.CTkEntry(self, placeholder_text="Search by username , id , email ,...")
             self.search_entry.pack(pady=5, padx=10, fill="x")
             
             ctk.CTkButton(self, text="Search", command=self.search_admin_users).pack(pady=10)

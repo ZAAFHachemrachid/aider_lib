@@ -92,7 +92,7 @@ class AuthorPage(ctk.CTkFrame):
         
         ctk.CTkLabel(self.search_frame, text="Search Authors", font=("Arial", 16, "bold")).pack(pady=5)
         
-        self.search_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Search by name...")
+        self.search_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Search by name , id , email ,...")
         self.search_entry.pack(pady=5, padx=10, fill="x")
         
         ctk.CTkButton(self.search_frame, text="Search", command=self.search_authors).pack(pady=10)

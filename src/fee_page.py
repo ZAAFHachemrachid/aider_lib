@@ -88,7 +88,7 @@ class FeePage(ctk.CTkFrame):
         
         ctk.CTkLabel(self.search_frame, text="Search Fees", font=("Arial", 16, "bold")).pack(pady=5)
         
-        self.search_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Search by loan ID...")
+        self.search_entry = ctk.CTkEntry(self.search_frame, placeholder_text="Search by any pram ...")
         self.search_entry.pack(pady=5, padx=10, fill="x")
         
         ctk.CTkButton(self.search_frame, text="Search", command=self.search_fees).pack(pady=10)
