@@ -8,6 +8,13 @@ def seed_data():
     conn = create_connection()
     cursor = conn.cursor()
 
+    # Clear existing data
+    cursor.execute("DELETE FROM users")
+    cursor.execute("DELETE FROM authors")
+    cursor.execute("DELETE FROM categories")
+    cursor.execute("DELETE FROM books")
+    cursor.execute("DELETE FROM loans")
+
     # Seed users
     users = [
         ('admin', 'admin123', 'Admin User', 'admin', 1),
