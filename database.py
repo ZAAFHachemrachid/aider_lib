@@ -25,12 +25,28 @@ def create_tables(conn):
             )
         """)
         cursor.execute("""
+            CREATE TABLE IF NOT EXISTS authors (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL
+            )
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS categories (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL
+            )
+        """)
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
-                author TEXT NOT NULL,
+                author_id INTEGER NOT NULL,
+                category_id INTEGER NOT NULL,
                 isbn TEXT UNIQUE NOT NULL,
-                available INTEGER NOT NULL DEFAULT 1
+                available INTEGER NOT NULL DEFAULT 1,
+                quantity_book INTEGER NOT NULL DEFAULT 1,
+                FOREIGN KEY (author_id) REFERENCES authors(id),
+                FOREIGN KEY (category_id) REFERENCES categories(id)
             )
         """)
         cursor.execute("""
