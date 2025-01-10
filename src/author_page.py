@@ -38,6 +38,15 @@ class AuthorPage(ctk.CTkFrame):
         self.name_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Name")
         self.name_entry.pack(pady=5, padx=10, fill="x")
         
+        self.phone_number_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Phone Number")
+        self.phone_number_entry.pack(pady=5, padx=10, fill="x")
+        
+        self.email_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Email")
+        self.email_entry.pack(pady=5, padx=10, fill="x")
+        
+        self.description_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Description")
+        self.description_entry.pack(pady=5, padx=10, fill="x")
+        
         ctk.CTkButton(self.create_frame, text="Create", command=self.create_author).pack(pady=10)
         
         # Update Form
@@ -86,7 +95,7 @@ class AuthorPage(ctk.CTkFrame):
         self.table_frame.grid_rowconfigure(0, weight=1)
         self.table_frame.grid_columnconfigure(0, weight=1)
         
-        columns = ('ID', 'Name')
+        columns = ('ID', 'Name', 'Phone Number', 'Email', 'Description')
         self.tree = ttk.Treeview(self.table_frame, columns=columns, show='headings')
         
         # Define headings
@@ -136,10 +145,14 @@ class AuthorPage(ctk.CTkFrame):
             conn = create_connection()
             cursor = conn.cursor()
             
+            phone_number = self.phone_number_entry.get()
+            email = self.email_entry.get()
+            description = self.description_entry.get()
+            
             cursor.execute("""
-                INSERT INTO authors (name)
-                VALUES (?)
-            """, (name,))
+                INSERT INTO authors (name, phone_number, email, description)
+                VALUES (?, ?, ?, ?)
+            """, (name, phone_number, email, description))
             
             conn.commit()
             conn.close()
@@ -162,7 +175,7 @@ class AuthorPage(ctk.CTkFrame):
             cursor = conn.cursor()
             
             cursor.execute("""
-                SELECT name
+                SELECT name, phone_number, email, description
                 FROM authors
                 WHERE id = ?
             """, (int(author_id),))
@@ -173,6 +186,12 @@ class AuthorPage(ctk.CTkFrame):
             if author:
                 self.update_name_entry.delete(0, 'end')
                 self.update_name_entry.insert(0, author[0])
+                self.update_phone_number_entry.delete(0, 'end')
+                self.update_phone_number_entry.insert(0, author[1])
+                self.update_email_entry.delete(0, 'end')
+                self.update_email_entry.insert(0, author[2])
+                self.update_description_entry.delete(0, 'end')
+                self.update_description_entry.insert(0, author[3])
             else:
                 messagebox.showerror("Error", "Author not found")
                 
@@ -188,14 +207,18 @@ class AuthorPage(ctk.CTkFrame):
                  messagebox.showerror("Error", "All fields are required")
                  return
             
+            new_phone_number = self.update_phone_number_entry.get()
+            new_email = self.update_email_entry.get()
+            new_description = self.update_description_entry.get()
+            
             conn = create_connection()
             cursor = conn.cursor()
             
             cursor.execute("""
                 UPDATE authors
-                SET name = ?
+                SET name = ?, phone_number = ?, email = ?, description = ?
                 WHERE id = ?
-            """, (new_name, int(author_id)))
+            """, (new_name, new_phone_number, new_email, new_description, int(author_id)))
             
             conn.commit()
             conn.close()
@@ -242,7 +265,7 @@ class AuthorPage(ctk.CTkFrame):
             
             # Get authors
             cursor.execute("""
-                SELECT id, name
+                SELECT id, name, phone_number, email, description
                 FROM authors
             """)
             
@@ -256,10 +279,16 @@ class AuthorPage(ctk.CTkFrame):
     
     def clear_create_entries(self):
         self.name_entry.delete(0, 'end')
+        self.phone_number_entry.delete(0, 'end')
+        self.email_entry.delete(0, 'end')
+        self.description_entry.delete(0, 'end')
     
     def clear_update_entries(self):
         self.update_id_entry.delete(0, 'end')
         self.update_name_entry.delete(0, 'end')
+        self.update_phone_number_entry.delete(0, 'end')
+        self.update_email_entry.delete(0, 'end')
+        self.update_description_entry.delete(0, 'end')
 
     def search_authors(self):
         try:
@@ -274,7 +303,7 @@ class AuthorPage(ctk.CTkFrame):
             
             # Get authors with filters
             query = """
-                SELECT id, name
+                SELECT id, name, phone_number, email, description
                 FROM authors
                 WHERE LOWER(name) LIKE ?
             """

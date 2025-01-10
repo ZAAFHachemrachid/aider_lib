@@ -38,6 +38,9 @@ class CategoryPage(ctk.CTkFrame):
         self.name_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Category Name")
         self.name_entry.pack(pady=5, padx=10, fill="x")
         
+        self.description_entry = ctk.CTkEntry(self.create_frame, placeholder_text="Description")
+        self.description_entry.pack(pady=5, padx=10, fill="x")
+        
         ctk.CTkButton(self.create_frame, text="Create", command=self.create_category).pack(pady=10)
         
         # Update Form
@@ -86,7 +89,7 @@ class CategoryPage(ctk.CTkFrame):
         self.table_frame.grid_rowconfigure(0, weight=1)
         self.table_frame.grid_columnconfigure(0, weight=1)
         
-        columns = ('ID', 'Name')
+        columns = ('ID', 'Name', 'Description')
         self.tree = ttk.Treeview(self.table_frame, columns=columns, show='headings')
         
         # Define headings
@@ -136,10 +139,12 @@ class CategoryPage(ctk.CTkFrame):
             conn = create_connection()
             cursor = conn.cursor()
             
+            description = self.description_entry.get()
+            
             cursor.execute("""
-                INSERT INTO categories (name)
-                VALUES (?)
-            """, (name,))
+                INSERT INTO categories (name, description)
+                VALUES (?, ?)
+            """, (name, description))
             
             conn.commit()
             conn.close()
@@ -162,7 +167,7 @@ class CategoryPage(ctk.CTkFrame):
             cursor = conn.cursor()
             
             cursor.execute("""
-                SELECT name
+                SELECT name, description
                 FROM categories
                 WHERE id = ?
             """, (int(category_id),))
@@ -173,6 +178,8 @@ class CategoryPage(ctk.CTkFrame):
             if category:
                 self.update_name_entry.delete(0, 'end')
                 self.update_name_entry.insert(0, category[0])
+                self.update_description_entry.delete(0, 'end')
+                self.update_description_entry.insert(0, category[1])
             else:
                 messagebox.showerror("Error", "Category not found")
                 
@@ -188,14 +195,16 @@ class CategoryPage(ctk.CTkFrame):
                 messagebox.showerror("Error", "Category ID and name are required")
                 return
             
+            new_description = self.update_description_entry.get()
+            
             conn = create_connection()
             cursor = conn.cursor()
             
             cursor.execute("""
                 UPDATE categories
-                SET name = ?
+                SET name = ?, description = ?
                 WHERE id = ?
-            """, (new_name, int(category_id)))
+            """, (new_name, new_description, int(category_id)))
             
             conn.commit()
             conn.close()
@@ -255,7 +264,7 @@ class CategoryPage(ctk.CTkFrame):
             
             # Get categories
             cursor.execute("""
-                SELECT id, name
+                SELECT id, name, description
                 FROM categories
                 ORDER BY name
             """)
@@ -270,10 +279,12 @@ class CategoryPage(ctk.CTkFrame):
     
     def clear_create_entries(self):
         self.name_entry.delete(0, 'end')
+        self.description_entry.delete(0, 'end')
     
     def clear_update_entries(self):
         self.update_id_entry.delete(0, 'end')
         self.update_name_entry.delete(0, 'end')
+        self.update_description_entry.delete(0, 'end')
 
     def search_categories(self):
         try:
@@ -288,7 +299,7 @@ class CategoryPage(ctk.CTkFrame):
             
             # Get categories with filters
             query = """
-                SELECT id, name
+                SELECT id, name, description
                 FROM categories
                 WHERE LOWER(name) LIKE ?
                 ORDER BY name
