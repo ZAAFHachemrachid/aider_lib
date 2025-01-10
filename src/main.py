@@ -13,8 +13,9 @@ from src.category_page import CategoryPage
 from src.admin_user_page import AdminUserPage
 from src.book_page import BookPage
 from src.loan_page import LoanPage
-from src.login_page import LoginPage
 from src.fee_page import FeePage
+from src.login_page import LoginPage
+from src.signup_page import SignupPage
 
 
 class LibraryApp(ctk.CTk):
@@ -125,7 +126,12 @@ class LibraryApp(ctk.CTk):
         # Create fee page
         self.fee_page = FeePage(self, self)
         
-        self.login_page = LoginPage(self, self)
+        # Create login frame
+        self.login_frame = ctk.CTkFrame(self)
+        self.login_frame.grid(row=0, column=1, sticky="nsew")
+        
+        self.login_page = LoginPage(self.login_frame, self)
+        self.signup_page = SignupPage(self.login_frame, self)
         self.user = None
         
         self.show_login_page()
@@ -137,8 +143,8 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
-        self.login_page.grid_remove()
         self.fee_page.grid_remove()
+        self.login_frame.grid_remove()
         # Show home page
         if self.user:
             self.home_page.grid(row=0, column=1, sticky="nsew")
@@ -204,7 +210,7 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
-        self.login_page.grid_remove()
+        self.login_frame.grid_remove()
         # Show admin page
         if self.user and self.user[4] == 'admin':
             self.admin_page.grid(row=0, column=1, sticky="nsew")
@@ -218,7 +224,7 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
-        self.login_page.grid_remove()
+        self.login_frame.grid_remove()
         # Show author page
         if self.user:
             self.author_page.grid(row=0, column=1, sticky="nsew")
@@ -232,7 +238,7 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
-        self.login_page.grid_remove()
+        self.login_frame.grid_remove()
         # Show category page
         if self.user:
             self.category_page.grid(row=0, column=1, sticky="nsew")
@@ -247,7 +253,7 @@ class LibraryApp(ctk.CTk):
         self.category_page.grid_remove()
         self.book_page.grid_remove()
         self.loan_page.grid_remove()
-        self.login_page.grid_remove()
+        self.login_frame.grid_remove()
         self.fee_page.grid_remove()
         # Show book page
         if self.user:
@@ -262,7 +268,7 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
-        self.login_page.grid_remove()
+        self.login_frame.grid_remove()
         self.fee_page.grid_remove()
         # Show loan page
         if self.user:
@@ -278,7 +284,7 @@ class LibraryApp(ctk.CTk):
         self.category_page.grid_remove()
         self.book_page.grid_remove()
         self.loan_page.grid_remove()
-        self.login_page.grid_remove()
+        self.login_frame.grid_remove()
         # Show fee page
         if self.user:
             self.fee_page.grid(row=0, column=1, sticky="nsew")
@@ -295,7 +301,10 @@ class LibraryApp(ctk.CTk):
         self.loan_page.grid_remove()
         self.fee_page.grid_remove()
         # Show login page
-        self.login_page.grid(row=0, column=1, sticky="nsew")
+        self.login_frame.grid(row=0, column=1, sticky="nsew")
+        self.login_page.grid(row=0, column=0, sticky="nsew")
+        self.signup_page.grid(row=0, column=0, sticky="nsew")
+        self.signup_page.grid_remove()
 
 if __name__ == "__main__":
     app = LibraryApp()
