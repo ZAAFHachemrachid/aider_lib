@@ -2,10 +2,6 @@ import customtkinter as ctk
 from tkinter import ttk, messagebox
 
 from database import create_connection
-from src.admin_user_create_form import AdminUserCreateForm
-from src.admin_user_delete_form import AdminUserDeleteForm
-from src.admin_user_update_form import AdminUserUpdateForm
-from src.admin_user_search_form import AdminUserSearchForm
 
 
 class AdminUserPage(ctk.CTkFrame):
@@ -36,10 +32,10 @@ class AdminUserPage(ctk.CTkFrame):
         ctk.CTkButton(self.switch_buttons_frame, text="Search Form", command=lambda: self.show_form("search")).grid(row=0, column=3, padx=2, sticky="ew")
         
         # Create forms
-        self.create_form = AdminUserCreateForm(self.left_container, self.controller, self)
-        self.update_form = AdminUserUpdateForm(self.left_container, self.controller, self)
-        self.delete_form = AdminUserDeleteForm(self.left_container, self.controller, self)
-        self.search_form = AdminUserSearchForm(self.left_container, self.controller, self)
+        self.create_form = self.AdminUserCreateForm(self.left_container, self.controller, self)
+        self.update_form = self.AdminUserUpdateForm(self.left_container, self.controller, self)
+        self.delete_form = self.AdminUserDeleteForm(self.left_container, self.controller, self)
+        self.search_form = self.AdminUserSearchForm(self.left_container, self.controller, self)
         
         # Right side - Table
         self.table_frame = ctk.CTkFrame(self)
@@ -68,7 +64,227 @@ class AdminUserPage(ctk.CTkFrame):
         
         # Load initial data
         self.refresh_table()
+    
+    class AdminUserCreateForm(ctk.CTkFrame):
+        def __init__(self, parent, controller, page):
+            super().__init__(parent)
+            self.controller = controller
+            self.page = page
+            
+            ctk.CTkLabel(self, text="Create Admin User", font=("Arial", 16, "bold")).pack(pady=5)
+            
+            self.username_entry = ctk.CTkEntry(self, placeholder_text="Username")
+            self.username_entry.pack(pady=5, padx=10, fill="x")
+            
+            self.password_entry = ctk.CTkEntry(self, placeholder_text="Password", show="*")
+            self.password_entry.pack(pady=5, padx=10, fill="x")
+            
+            ctk.CTkButton(self, text="Create", command=self.create_admin_user).pack(pady=10)
         
+        def create_admin_user(self):
+            try:
+                username = self.username_entry.get()
+                password = self.password_entry.get()
+                
+                if not username or not password:
+                    messagebox.showerror("Error", "All fields are required")
+                    return
+                
+                conn = create_connection()
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    INSERT INTO admin_users (username, password)
+                    VALUES (?, ?)
+                """, (username, password))
+                
+                conn.commit()
+                conn.close()
+                
+                self.clear_entries()
+                self.page.refresh_table()
+                messagebox.showinfo("Success", "Admin user created successfully")
+                
+            except Exception as e:
+                messagebox.showerror("Error", f"Error creating admin user: {e}")
+        
+        def clear_entries(self):
+            self.username_entry.delete(0, 'end')
+            self.password_entry.delete(0, 'end')
+    
+    class AdminUserUpdateForm(ctk.CTkFrame):
+        def __init__(self, parent, controller, page):
+            super().__init__(parent)
+            self.controller = controller
+            self.page = page
+            
+            ctk.CTkLabel(self, text="Update Admin User", font=("Arial", 16, "bold")).pack(pady=5)
+            
+            self.id_entry = ctk.CTkEntry(self, placeholder_text="Admin User ID")
+            self.id_entry.pack(pady=5, padx=10, fill="x")
+            
+            ctk.CTkButton(self, text="Load User", command=self.load_admin_user).pack(pady=5)
+            
+            self.username_entry = ctk.CTkEntry(self, placeholder_text="New Username")
+            self.username_entry.pack(pady=5, padx=10, fill="x")
+            
+            self.password_entry = ctk.CTkEntry(self, placeholder_text="New Password", show="*")
+            self.password_entry.pack(pady=5, padx=10, fill="x")
+            
+            ctk.CTkButton(self, text="Update", command=self.update_admin_user).pack(pady=10)
+        
+        def load_admin_user(self):
+            try:
+                admin_user_id = self.id_entry.get()
+                if not admin_user_id:
+                    messagebox.showerror("Error", "Please enter a admin user ID")
+                    return
+                
+                conn = create_connection()
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    SELECT username, password
+                    FROM admin_users
+                    WHERE id = ?
+                """, (int(admin_user_id),))
+                
+                admin_user = cursor.fetchone()
+                conn.close()
+                
+                if admin_user:
+                    self.username_entry.delete(0, 'end')
+                    self.username_entry.insert(0, admin_user[0])
+                    self.password_entry.delete(0, 'end')
+                    self.password_entry.insert(0, admin_user[1])
+                else:
+                    messagebox.showerror("Error", "Admin user not found")
+                    
+            except Exception as e:
+                messagebox.showerror("Error", f"Error loading admin user: {e}")
+        
+        def update_admin_user(self):
+            try:
+                admin_user_id = self.id_entry.get()
+                new_username = self.username_entry.get()
+                new_password = self.password_entry.get()
+                
+                if not all([admin_user_id, new_username, new_password]):
+                    messagebox.showerror("Error", "All fields are required")
+                    return
+                
+                conn = create_connection()
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    UPDATE admin_users
+                    SET username = ?, password = ?
+                    WHERE id = ?
+                """, (new_username, new_password, int(admin_user_id)))
+                
+                conn.commit()
+                conn.close()
+                
+                self.clear_entries()
+                self.page.refresh_table()
+                messagebox.showinfo("Success", "Admin user updated successfully")
+                
+            except Exception as e:
+                messagebox.showerror("Error", f"Error updating admin user: {e}")
+        
+        def clear_entries(self):
+            self.id_entry.delete(0, 'end')
+            self.username_entry.delete(0, 'end')
+            self.password_entry.delete(0, 'end')
+    
+    class AdminUserDeleteForm(ctk.CTkFrame):
+        def __init__(self, parent, controller, page):
+            super().__init__(parent)
+            self.controller = controller
+            self.page = page
+            
+            ctk.CTkLabel(self, text="Delete Admin User", font=("Arial", 16, "bold")).pack(pady=5)
+            
+            self.id_entry = ctk.CTkEntry(self, placeholder_text="Admin User ID")
+            self.id_entry.pack(pady=5, padx=10, fill="x")
+            
+            ctk.CTkButton(self, text="Delete", command=self.delete_admin_user, 
+                         fg_color="#FF5252", hover_color="#FF0000").pack(pady=10)
+        
+        def delete_admin_user(self):
+            try:
+                admin_user_id = self.id_entry.get()
+                if not admin_user_id:
+                    messagebox.showerror("Error", "Please enter a admin user ID")
+                    return
+                
+                conn = create_connection()
+                cursor = conn.cursor()
+                
+                cursor.execute("""
+                    DELETE FROM admin_users WHERE id = ?
+                """, (int(admin_user_id),))
+                
+                conn.commit()
+                conn.close()
+                
+                self.clear_entries()
+                self.page.refresh_table()
+                messagebox.showinfo("Success", "Admin user deleted successfully")
+                
+            except Exception as e:
+                messagebox.showerror("Error", f"Error deleting admin user: {e}")
+        
+        def clear_entries(self):
+            self.id_entry.delete(0, 'end')
+    
+    class AdminUserSearchForm(ctk.CTkFrame):
+        def __init__(self, parent, controller, page):
+            super().__init__(parent)
+            self.controller = controller
+            self.page = page
+            
+            ctk.CTkLabel(self, text="Search Admin Users", font=("Arial", 16, "bold")).pack(pady=5)
+            
+            self.search_entry = ctk.CTkEntry(self, placeholder_text="Search by username...")
+            self.search_entry.pack(pady=5, padx=10, fill="x")
+            
+            ctk.CTkButton(self, text="Search", command=self.search_admin_users).pack(pady=10)
+            ctk.CTkButton(self, text="Clear Search", command=self.clear_search).pack(pady=5)
+        
+        def search_admin_users(self):
+            try:
+                search_term = self.search_entry.get().strip().lower()
+                
+                # Clear the current table
+                for item in self.page.tree.get_children():
+                    self.page.tree.delete(item)
+                    
+                conn = create_connection()
+                cursor = conn.cursor()
+                
+                # Get admin users with filters
+                query = """
+                    SELECT id, username, password
+                    FROM admin_users
+                    WHERE LOWER(username) LIKE ?
+                """
+                
+                search_pattern = f"%{search_term}%"
+                cursor.execute(query, (search_pattern,))
+                
+                for row in cursor.fetchall():
+                    self.page.tree.insert('', 'end', values=row)
+                    
+                conn.close()
+                
+            except Exception as e:
+                messagebox.showerror("Error", f"Error searching admin users: {e}")
+        
+        def clear_search(self):
+            self.search_entry.delete(0, 'end')
+            self.page.refresh_table()
+            
     def show_form(self, form_type):
         # Hide all forms first
         self.create_form.grid_remove()
