@@ -144,6 +144,16 @@ class LibraryApp(ctk.CTk):
         self.loan_page.grid_remove()
         # Show book page
         self.book_page.grid(row=0, column=1, sticky="nsew")
+        
+    def show_loan_page(self):
+        # Hide all pages
+        self.home_page.grid_remove()
+        self.admin_page.grid_remove()
+        self.author_page.grid_remove()
+        self.category_page.grid_remove()
+        self.book_page.grid_remove()
+        # Show loan page
+        self.loan_page.grid(row=0, column=1, sticky="nsew")
 
 if __name__ == "__main__":
     app = LibraryApp()
