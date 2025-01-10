@@ -72,6 +72,12 @@ class LibraryApp(ctk.CTk):
                                                    hover_color=("gray70", "gray30"),
                                                    command=self.show_loan_page)
         self.loan_button.grid(row=6, column=0, sticky="ew")
+        
+        self.fee_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Fees",
+                                                   fg_color="transparent", text_color=("gray10", "gray90"),
+                                                   hover_color=("gray70", "gray30"),
+                                                   command=self.show_fee_page)
+        self.fee_button.grid(row=7, column=0, sticky="ew")
 
         self.exit_button = ctk.CTkButton(self.navigation_frame, corner_radius=0, height=40, border_spacing=10, text="Exit",
                                                    fg_color="transparent", text_color=("gray10", "gray90"),
@@ -115,6 +121,9 @@ class LibraryApp(ctk.CTk):
         # Create loan page
         self.loan_page = LoanPage(self, self)
         
+        # Create fee page
+        self.fee_page = FeePage(self, self)
+        
         self.login_page = LoginPage(self, self)
         self.user = None
         
@@ -128,6 +137,7 @@ class LibraryApp(ctk.CTk):
         self.category_page.grid_remove()
         self.book_page.grid_remove()
         self.login_page.grid_remove()
+        self.fee_page.grid_remove()
         # Show home page
         if self.user:
             self.home_page.grid(row=0, column=1, sticky="nsew")
@@ -237,6 +247,7 @@ class LibraryApp(ctk.CTk):
         self.book_page.grid_remove()
         self.loan_page.grid_remove()
         self.login_page.grid_remove()
+        self.fee_page.grid_remove()
         # Show book page
         if self.user:
             self.book_page.grid(row=0, column=1, sticky="nsew")
@@ -251,9 +262,25 @@ class LibraryApp(ctk.CTk):
         self.category_page.grid_remove()
         self.book_page.grid_remove()
         self.login_page.grid_remove()
+        self.fee_page.grid_remove()
         # Show loan page
         if self.user:
             self.loan_page.grid(row=0, column=1, sticky="nsew")
+        else:
+            self.show_login_page()
+    
+    def show_fee_page(self):
+        # Hide all pages
+        self.home_page.grid_remove()
+        self.admin_page.grid_remove()
+        self.author_page.grid_remove()
+        self.category_page.grid_remove()
+        self.book_page.grid_remove()
+        self.loan_page.grid_remove()
+        self.login_page.grid_remove()
+        # Show fee page
+        if self.user:
+            self.fee_page.grid(row=0, column=1, sticky="nsew")
         else:
             self.show_login_page()
     
@@ -265,6 +292,7 @@ class LibraryApp(ctk.CTk):
         self.category_page.grid_remove()
         self.book_page.grid_remove()
         self.loan_page.grid_remove()
+        self.fee_page.grid_remove()
         # Show login page
         self.login_page.grid(row=0, column=1, sticky="nsew")
 
