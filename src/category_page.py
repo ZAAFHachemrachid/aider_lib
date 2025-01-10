@@ -57,6 +57,9 @@ class CategoryPage(ctk.CTkFrame):
         self.update_name_entry = ctk.CTkEntry(self.update_frame, placeholder_text="New Name")
         self.update_name_entry.pack(pady=5, padx=10, fill="x")
         
+        self.update_description_entry = ctk.CTkEntry(self.update_frame, placeholder_text="New Description")
+        self.update_description_entry.pack(pady=5, padx=10, fill="x")
+        
         ctk.CTkButton(self.update_frame, text="Update", command=self.update_category).pack(pady=10)
         
         # Delete Form
