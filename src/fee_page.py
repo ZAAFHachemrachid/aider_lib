@@ -95,6 +95,9 @@ class FeePage(ctk.CTkFrame):
         ctk.CTkButton(self.search_frame, text="Show Unpaid", command=self.search_unpaid_fees).pack(pady=5)
         ctk.CTkButton(self.search_frame, text="Clear Search", command=self.clear_search).pack(pady=5)
         
+        self.unpaid_fees_label = ctk.CTkLabel(self.search_frame, text="Total Unpaid Fees: 0", font=("Arial", 12))
+        self.unpaid_fees_label.pack(pady=5)
+        
         # Right side - Table
         self.table_frame = ctk.CTkFrame(self)
         self.table_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
@@ -122,6 +125,7 @@ class FeePage(ctk.CTkFrame):
         
         # Load initial data
         self.refresh_table()
+        self.calculate_unpaid_fees()
         
     def show_form(self, form_type):
         # Hide all forms first
@@ -344,7 +348,27 @@ class FeePage(ctk.CTkFrame):
             
         except Exception as e:
             messagebox.showerror("Error", f"Error searching unpaid fees: {e}")
+    
+    def calculate_unpaid_fees(self):
+        try:
+            conn = create_connection()
+            cursor = conn.cursor()
             
+            cursor.execute("SELECT SUM(amount) FROM fees WHERE paid = 0")
+            total_unpaid = cursor.fetchone()[0]
+            
+            conn.close()
+            
+            if total_unpaid is None:
+                total_unpaid = 0
+            
+            self.unpaid_fees_label.configure(text=f"Total Unpaid Fees: {total_unpaid:.2f}")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Error calculating unpaid fees: {e}")
+    
     def clear_search(self):
         self.search_entry.delete(0, 'end')
         self.refresh_table()
+        self.calculate_unpaid_fees()
+        self.calculate_unpaid_fees()
