@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
-from src.database import create_connection
+from database import create_connection
 
 class SignupPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
