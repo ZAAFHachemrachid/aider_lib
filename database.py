@@ -62,6 +62,15 @@ def create_tables(conn):
                 FOREIGN KEY (book_id) REFERENCES books(id)
             )
         """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS fees (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                loan_id INTEGER,
+                amount REAL,
+                paid INTEGER,
+                FOREIGN KEY (loan_id) REFERENCES loans(id)
+            )
+        """)
         conn.commit()
         print("Tables created successfully")
     except sqlite3.Error as e:
