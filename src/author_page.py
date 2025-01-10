@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 from database import create_connection
+from database import create_connection
 
 class AuthorPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
