@@ -1,100 +1,115 @@
 import sqlite3
+from datetime import datetime, timedelta
+import hashlib
 
-def create_connection():
-    conn = sqlite3.connect('library.db')
-    return conn
-
-def seed_data():
-    conn = create_connection()
-    cursor = conn.cursor()
-
-    # Clear existing data
-    cursor.execute("DELETE FROM users")
-    cursor.execute("DELETE FROM authors")
-    cursor.execute("DELETE FROM categories")
-    cursor.execute("DELETE FROM books")
-    cursor.execute("DELETE FROM loans")
-    cursor.execute("DELETE FROM fees")
-
-    # Seed users
-    users = [
-        ('r', 'r', 'Admin User', 'admin', 1),
-        ('admin', 'admin123', 'Admin User', 'admin', 1),
-        ('user1', 'user123', 'Regular User 1', 'user', 1),
-        ('user2', 'user123', 'Regular User 2', 'user', 0),
-        ('user3', 'user123', 'Regular User 3', 'user', 1),
-        ('user4', 'user123', 'Regular User 4', 'user', 0)
-    ]
-    cursor.executemany("INSERT INTO users (username, password, name, role, approved) VALUES (?, ?, ?, ?, ?)", users)
-
-    # Seed authors
-    authors = [
-        ('Jane Austen', '123-456-7890', 'jane.austen@example.com', 'A famous novelist'),
-        ('Charles Dickens', '987-654-3210', 'charles.dickens@example.com', 'Another famous novelist'),
-        ('Agatha Christie', '555-123-4567', 'agatha.christie@example.com', 'A mystery writer'),
-        ('Leo Tolstoy', '111-222-3333', 'leo.tolstoy@example.com', 'A Russian writer'),
-        ('Virginia Woolf', '444-555-6666', 'virginia.woolf@example.com', 'A modernist writer')
-    ]
-    cursor.executemany("INSERT INTO authors (name, phone_number, email, description) VALUES (?, ?, ?, ?)", authors)
-
-    # Seed categories
-    categories = [
-        ('Fiction', 'Fictional stories'),
-        ('Mystery', 'Mystery and suspense'),
-        ('Classic', 'Classic literature'),
-        ('Science Fiction', 'Sci-fi stories'),
-        ('Fantasy', 'Fantasy worlds')
-    ]
-    cursor.executemany("INSERT INTO categories (name, description) VALUES (?, ?)", categories)
-
-    # Seed books
-    books = [
-        ('Pride and Prejudice', 1, 1, '978-0141439518', 5, 5),
-        ('Oliver Twist', 2, 1, '978-0141439648', 3, 3),
-        ('The Mysterious Affair at Styles', 3, 2, '978-0062073565', 2, 2),
-        ('The ABC Murders', 3, 2, '978-0007119310', 4, 4),
-        ('Great Expectations', 2, 3, '978-0141439631', 1, 1),
-        ('War and Peace', 4, 3, '978-0140444179', 2, 2),
-        ('To the Lighthouse', 5, 1, '978-0156907394', 3, 3),
-        ('Dune', 6, 4, '978-0441172719', 4, 4),
-        ('The Hobbit', 7, 5, '978-0618260264', 5, 5),
-        ('The Lord of the Rings', 7, 5, '978-0618260271', 2, 2)
-    ]
-    cursor.executemany("INSERT INTO books (title, author_id, category_id, isbn, quantity_book, available) VALUES (?, ?, ?, ?, ?, ?)", books)
+class DatabaseSeeder:
+    def __init__(self, db_name='library.db'):
+        """Initialize the seeder with database connection"""
+        self.conn = sqlite3.connect(db_name)
+        self.cursor = self.conn.cursor()
     
-    # Seed loans
-    loans = [
-        (3, 1, '2024-01-05', '2024-01-20'),
-        (4, 2, '2024-01-10', None),
-        (5, 3, '2024-01-15', '2024-01-25'),
-        (6, 4, '2024-01-20', None),
-        (7, 5, '2024-01-25', '2024-02-05'),
-        (8, 1, '2024-02-01', None),
-        (9, 2, '2024-02-05', '2024-02-15'),
-        (10, 3, '2024-02-10', None),
-        (1, 6, '2024-02-15', '2024-02-25'),
-        (2, 7, '2024-02-20', None)
-    ]
-    cursor.executemany("INSERT INTO loans (book_id, user_id, borrow_date, return_date) VALUES (?, ?, ?, ?)", loans)
+    def _hash_password(self, password):
+        """Simple password hashing"""
+        return password
     
-    # Seed fees
-    fees = [
-        (1, 10.00, 1),
-        (2, 5.00, 0),
-        (3, 7.50, 1),
-        (4, 12.00, 0),
-        (5, 2.50, 1),
-        (6, 8.00, 0),
-        (7, 6.00, 1),
-        (8, 9.00, 0),
-        (9, 11.00, 1),
-        (10, 4.00, 0)
-    ]
-    cursor.executemany("INSERT INTO fees (loan_id, amount, paid) VALUES (?, ?, ?)", fees)
-
-    conn.commit()
-    conn.close()
+    def seed_users(self):
+        """Seed users table with initial data"""
+        users = [
+            ('admin', self._hash_password('admin'), 'r', 'admin', 1),
+            ('admin', self._hash_password('admin123'), 'Admin User', 'admin', 1),
+            ('librarian', self._hash_password('lib123'), 'Head Librarian', 'librarian', 1),
+            ('john_doe', self._hash_password('user123'), 'John Doe', 'user', 1),
+            ('jane_smith', self._hash_password('user123'), 'Jane Smith', 'user', 1)
+        ]
+        self.cursor.executemany('''
+            INSERT OR IGNORE INTO users (username, password, name, role, approved)
+            VALUES (?, ?, ?, ?, ?)
+        ''', users)
+        
+    def seed_authors(self):
+        """Seed authors table with initial data"""
+        authors = [
+            ('J.K. Rowling', '+44 20 7123 4567', 'jk@example.com', 'British author known for Harry Potter series'),
+            ('George Orwell', '+44 20 7123 4568', 'george@example.com', 'English novelist and essayist'),
+            ('Jane Austen', '+44 20 7123 4569', 'jane@example.com', 'English novelist known for Pride and Prejudice'),
+            ('Stephen King', '+1 207 555 0123', 'stephen@example.com', 'American author of horror and fantasy novels')
+        ]
+        self.cursor.executemany('''
+            INSERT OR IGNORE INTO authors (name, phone_number, email, description)
+            VALUES (?, ?, ?, ?)
+        ''', authors)
+    
+    def seed_categories(self):
+        """Seed categories table with initial data"""
+        categories = [
+            ('Fiction', 'Novels and made-up stories'),
+            ('Non-Fiction', 'Factual books and biographies'),
+            ('Science Fiction', 'Future and science-based fiction'),
+            ('Mystery', 'Crime and detective stories'),
+            ('Fantasy', 'Magic and supernatural stories')
+        ]
+        self.cursor.executemany('''
+            INSERT OR IGNORE INTO categories (name, description)
+            VALUES (?, ?)
+        ''', categories)
+    
+    def seed_books(self):
+        """Seed books table with initial data"""
+        books = [
+            ('Harry Potter and the Philosopher\'s Stone', 1, 5, '9780747532699', 1, 5),
+            ('1984', 2, 3, '9780451524935', 1, 3),
+            ('Pride and Prejudice', 3, 1, '9780141439518', 1, 4),
+            ('The Shining', 4, 1, '9780307743657', 1, 2),
+            ('Animal Farm', 2, 1, '9780452284241', 1, 3)
+        ]
+        self.cursor.executemany('''
+            INSERT OR IGNORE INTO books (title, author_id, category_id, isbn, available, quantity_book)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', books)
+    
+    def seed_loans(self):
+        """Seed loans table with initial data"""
+        current_date = datetime.now()
+        loans = [
+            (3, 1, (current_date - timedelta(days=15)).strftime('%Y-%m-%d'),
+             (current_date + timedelta(days=15)).strftime('%Y-%m-%d'),
+             (current_date - timedelta(days=15)).strftime('%Y-%m-%d'), None, 0.0),
+            (4, 2, (current_date - timedelta(days=15)).strftime('%Y-%m-%d'),
+             (current_date - timedelta(days=15)).strftime('%Y-%m-%d'),
+             (current_date - timedelta(days=15)).strftime('%Y-%m-%d'), None, 5.0)
+        ]
+        self.cursor.executemany('''
+            INSERT OR IGNORE INTO loans (user_id, book_id, borrow_date, due_date, loan_date, return_date, fine_amount)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', loans)
+    
+    def seed_fees(self):
+        """Seed fees table with initial data"""
+        fees = [
+            (2, 5.0, 0),  # Unpaid fee for the overdue book
+        ]
+        self.cursor.executemany('''
+            INSERT OR IGNORE INTO fees (loan_id, amount, paid)
+            VALUES (?, ?, ?)
+        ''', fees)
+    
+    def seed_all(self):
+        """Seed all tables with initial data"""
+        try:
+            self.seed_users()
+            self.seed_authors()
+            self.seed_categories()
+            self.seed_books()
+            self.seed_loans()
+            self.seed_fees()
+            self.conn.commit()
+            print("Database seeded successfully!")
+        except sqlite3.Error as e:
+            print(f"Error seeding database: {e}")
+            self.conn.rollback()
+        finally:
+            self.conn.close()
 
 if __name__ == '__main__':
-    seed_data()
-    print("Dummy data seeded successfully.")
+    seeder = DatabaseSeeder()
+    seeder.seed_all()
