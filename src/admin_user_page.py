@@ -231,7 +231,7 @@ class AdminUserPage(ctk.CTkFrame):
             self.username_entry.delete(0, 'end')
             self.password_entry.delete(0, 'end')
             self.name_entry.delete(0, 'end')
-            self.role_entry.set('')
+            self.role_entry.set("")
             self.approved_var.set(False)
     
     class AdminUserDeleteForm(ctk.CTkFrame):
@@ -324,10 +324,10 @@ class AdminUserPage(ctk.CTkFrame):
             
     def show_form(self, form_type):
         # Hide all forms first
-        self.create_form.grid_remove()
-        self.update_form.grid_remove()
-        self.delete_form.grid_remove()
-        self.search_form.grid_remove()
+        self.create_form.grid_forget()
+        self.update_form.grid_forget()
+        self.delete_form.grid_forget()
+        self.search_form.grid_forget()
         
         # Show the selected form
         if form_type == "create":
