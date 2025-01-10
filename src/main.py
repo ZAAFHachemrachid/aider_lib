@@ -22,7 +22,7 @@ class LibraryApp(ctk.CTk):
 
         self.title("Library Management System")
         self.geometry("800x600")
-        self.bg_color = "#f0f0f0"
+        self.bg_color = "#000000"
 
         # Configure grid layout (1x2)
         self.grid_columnconfigure(1, weight=1)
