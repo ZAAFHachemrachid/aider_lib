@@ -14,6 +14,7 @@ from src.admin_user_page import AdminUserPage
 from src.book_page import BookPage
 from src.loan_page import LoanPage
 from src.login_page import LoginPage
+from src.fee_page import FeePage
 
 
 class LibraryApp(ctk.CTk):
