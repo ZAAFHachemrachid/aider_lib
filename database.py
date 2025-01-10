@@ -54,7 +54,7 @@ def create_tables(conn):
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 book_id INTEGER NOT NULL,
-                borrow_date TEXT NOT NULL,
+                loan_date TEXT NOT NULL,
                 due_date TEXT NOT NULL,
                 return_date TEXT,
                 fine_amount REAL DEFAULT 0.0,

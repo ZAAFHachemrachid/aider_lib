@@ -75,7 +75,7 @@ def seed_data():
         (1, 6, '2024-02-15', '2024-02-25'),
         (2, 7, '2024-02-20', None)
     ]
-    cursor.executemany("INSERT INTO loans (book_id, user_id, loan_date, return_date) VALUES (?, ?, ?, ?)", loans)
+    cursor.executemany("INSERT INTO loans (book_id, user_id, borrow_date, return_date) VALUES (?, ?, ?, ?)", loans)
     
     # Seed fees
     fees = [
