@@ -82,7 +82,7 @@ class LibraryApp(ctk.CTk):
         # Create pages
         self.home_page = CTkScrollableFrame(self)
         self.home_label = ctk.CTkLabel(self.home_page, text="Welcome to the Library Management System", font=("Arial", 20, "bold"))
-        self.home_label.pack(pady=20)
+        self.home_label.grid(row=0, column=0, columnspan=3, pady=20, sticky="ew")
         
         # Labels for counts
         self.active_loans_label = ctk.CTkLabel(self.home_page, text="Active Loans: 0", fg_color=self.bg_color)
@@ -96,7 +96,9 @@ class LibraryApp(ctk.CTk):
         
         # Chart frame
         self.chart_frame = ctk.CTkFrame(self.home_page)
-        self.chart_frame.pack(pady=20, padx=20, fill="both", expand=True)
+        self.chart_frame.grid(row=2, column=0, columnspan=3, pady=20, padx=20, sticky="nsew")
+        self.home_page.grid_columnconfigure((0,1,2), weight=1)
+        self.home_page.grid_rowconfigure(2, weight=1)
 
         # Create admin page
         self.admin_page = AdminUserPage(self, self)
