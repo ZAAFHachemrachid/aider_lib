@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 from src.database import create_connection
-from datetime import date
+from datetime import date, datetime
 
 class LoanPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -249,20 +249,30 @@ class LoanPage(ctk.CTkFrame):
             
             return_date = date.today().strftime("%Y-%m-%d")
             
-            cursor.execute("""
-                UPDATE loans SET return_date = ? WHERE id = ?
-            """, (return_date, int(loan_id)))
+            # Get loan details
+            cursor.execute("SELECT due_date, book_id FROM loans WHERE id = ?", (int(loan_id),))
+            loan = cursor.fetchone()
+            due_date_str = loan[0]
+            book_id = loan[1]
+            
+            if due_date_str:
+                due_date = datetime.strptime(due_date_str, "%Y-%m-%d").date()
+                return_date_obj = datetime.strptime(return_date, "%Y-%m-%d").date()
+                
+                if return_date_obj > due_date:
+                    overdue_days = (return_date_obj - due_date).days
+                    fee_amount = overdue_days * 1.0  # Example: $1 per day
+                    
+                    # Create a new fee record
+                    cursor.execute("""
+                        INSERT INTO fees (loan_id, amount, paid)
+                        VALUES (?, ?, ?)
+                    """, (int(loan_id), fee_amount, 0))
+            
+            cursor.execute("UPDATE loans SET return_date = ? WHERE id = ?", (return_date, int(loan_id)))
             
             # Update book availability
-            cursor.execute("""
-                SELECT book_id FROM loans WHERE id = ?
-            """, (int(loan_id),))
-            
-            book_id = cursor.fetchone()[0]
-            
-            cursor.execute("""
-                UPDATE books SET available = available + 1 WHERE id = ?
-            """, (int(book_id),))
+            cursor.execute("UPDATE books SET available = available + 1 WHERE id = ?", (int(book_id),))
             
             conn.commit()
             conn.close()
