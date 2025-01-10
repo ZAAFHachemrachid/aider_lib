@@ -8,7 +8,7 @@ class BookPage(ctk.CTkFrame):
         self.label.pack(pady=20)
 import customtkinter as ctk
 from tkinter import ttk, messagebox
-from src.database import create_connection
+from database import create_connection
 
 class BookPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
