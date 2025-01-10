@@ -1,8 +1,5 @@
 /drop
 /add       all
 /add       src\admin_user_page.py
-/add       src\author_page.py
-/add       src\book_page.py
-/add       src\category_page.py
-/add       src\fee_page.py
 /add       src\loan_page.py
+/add       src\main.py
