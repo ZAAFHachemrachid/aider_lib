@@ -28,6 +28,8 @@ class LoanPage(ctk.CTkFrame):
         # Create buttons to switch between forms
         ctk.CTkButton(self.switch_buttons_frame, text="Create Loan", command=lambda: self.show_form("create")).grid(row=0, column=0, padx=2, sticky="ew")
         ctk.CTkButton(self.switch_buttons_frame, text="Return Loan", command=lambda: self.show_form("return")).grid(row=0, column=1, padx=2, sticky="ew")
+        ctk.CTkButton(self.switch_buttons_frame, text="Update Loan", command=lambda: self.show_form("update")).grid(row=0, column=2, padx=2, sticky="ew")
+        ctk.CTkButton(self.switch_buttons_frame, text="Delete Loan", command=lambda: self.show_form("delete")).grid(row=0, column=3, padx=2, sticky="ew")
         
         # Create Loan Form
         self.create_frame = ctk.CTkFrame(self.left_container)
