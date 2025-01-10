@@ -4,8 +4,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import customtkinter as ctk
 from customtkinter import CTkScrollableFrame
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
 from src.author_page import AuthorPage
 from src.database import create_connection
 from tkinter import messagebox
@@ -101,12 +99,6 @@ class LibraryApp(ctk.CTk):
         
         self.available_books_label = ctk.CTkLabel(self.home_page, text="Available Books: 0", fg_color=self.bg_color)
         self.available_books_label.grid(row=1, column=2, padx=10, pady=5, sticky="w")
-        
-        # Chart frame
-        self.chart_frame = ctk.CTkFrame(self.home_page)
-        self.chart_frame.grid(row=2, column=0, columnspan=3, pady=20, padx=20, sticky="nsew")
-        self.home_page.grid_columnconfigure((0,1,2), weight=1)
-        self.home_page.grid_rowconfigure(2, weight=1)
 
         # Create admin page
         self.admin_page = AdminUserPage(self, self)
@@ -148,7 +140,6 @@ class LibraryApp(ctk.CTk):
         # Show home page
         if self.user:
             self.home_page.grid(row=0, column=1, sticky="nsew")
-            self.show_book_chart()
             self.update_home_page_labels()
         else:
             self.show_login_page()
@@ -177,31 +168,6 @@ class LibraryApp(ctk.CTk):
             
         except Exception as e:
             messagebox.showerror("Error", f"Error updating home page labels: {e}")
-            
-    def show_book_chart(self):
-        # Create a sample chart
-        fig = Figure(figsize=(5, 4), dpi=100)
-        ax = fig.add_subplot(111)
-        
-        # Sample data (replace with actual data from your database)
-        book_counts = {
-            "Fiction": 10,
-            "Mystery": 5,
-            "Classic": 8
-        }
-        
-        categories = list(book_counts.keys())
-        counts = list(book_counts.values())
-        
-        ax.bar(categories, counts)
-        ax.set_title("Number of Books per Category")
-        ax.set_xlabel("Category")
-        ax.set_ylabel("Number of Books")
-        
-        # Embed the chart in the Tkinter frame
-        canvas = FigureCanvasTkAgg(fig, master=self.chart_frame)
-        canvas_widget = canvas.get_tk_widget()
-        canvas_widget.pack(fill="both", expand=True)
 
     def show_admin_page(self):
         # Hide all pages
