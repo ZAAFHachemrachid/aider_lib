@@ -7,6 +7,7 @@ from src.author_page import AuthorPage
 from src.category_page import CategoryPage
 from src.admin_user_page import AdminUserPage
 from src.book_page import BookPage
+from src.loan_page import LoanPage
 
 
 class LibraryApp(ctk.CTk):
@@ -82,6 +83,9 @@ class LibraryApp(ctk.CTk):
         # Create book page
         self.book_page = BookPage(self, self)
         
+        # Create loan page
+        self.loan_page = LoanPage(self, self)
+        
         self.show_home_page()
 
     def show_home_page(self):
@@ -131,6 +135,7 @@ class LibraryApp(ctk.CTk):
         self.author_page.grid_remove()
         self.category_page.grid_remove()
         self.book_page.grid_remove()
+        self.loan_page.grid_remove()
         # Show book page
         self.book_page.grid(row=0, column=1, sticky="nsew")
 
